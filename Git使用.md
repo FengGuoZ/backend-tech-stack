@@ -26,31 +26,7 @@ $ git clone https://github.com/FengGuoZ/FengGuoSZ.git
 
 
 
-#### git config 查看配置信息
 
-```bash
-$ git config user.name
-$ git config user.email
-```
-
-![image-20220614142201571](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220614142201571.png)
-
-
-
-#### git config 设置配置
-
-- git采用**三级配置结构**
-  - 仓库级(local) > 用户级(--global) > 系统级别(sys)
-  - 每一级都有各自的.config文件
-
-```bash
-git config --global user.email "1541441163@qq.com"	# 将用户邮箱设置为1541441163@qq.com，配置结果写入用户级.config文件中
-git config --global core.quotepath false			# 解决git status显示中文文件名乱码的问题
-```
-
-![image-20220716162628082](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220716162628082.png)
-
-![image-20220716162657599](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220716162657599.png)
 
 #### git status 查看仓库状态，显示变更
 
@@ -88,3 +64,41 @@ $ git push origin main # 将本地main分支上传至远程main分支
 
 ![image-20220614163252596](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220614163252596.png)
 
+
+
+#### git config 查看配置信息
+
+```bash
+$ git config user.name
+$ git config user.email
+```
+
+![image-20220614142201571](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220614142201571.png)
+
+
+
+#### git config 设置配置
+
+git采用**三级配置结构**
+
+- 仓库级(--local) > 用户级(--global) > 系统级别(--sys)
+- 每一级都有各自的.config文件
+
+```bash
+git config --global user.email "1541441163@qq.com"		# 将用户邮箱设置为1541441163@qq.com，配置结果写入用户级.config文件中
+git config --global core.quotepath false				# 解决git status显示中文文件名乱码的问题
+git config --global http.proxy http://127.0.0.1:33210	
+git config --global https.proxy https://127.0.0.1:33210	# 设置git的https代理，解决挂上vpn后git由于不走代理无法push的问题，33210为代理端口
+```
+
+![image-20220716162628082](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220716162628082.png)
+
+![image-20220718235318287](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220718235318287.png)
+
+![image-20220718235609499](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220718235609499.png)
+
+
+
+#### git config --list 查看当前配置
+
+![image-20220719000229155](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220719000229155.png)
