@@ -1610,24 +1610,6 @@ void setName(const string& name);
 
 
 
-### 6 C++运算符重载🌼
-
-- operator是C++的一个关键字
-- operator和运算符一起使用，表示一个运算符重载函数
-- 可将operator和运算符（如operator==）**视为类的一个成员函数名**
-- 运算符是**左调用**即运算符左边的对象调用了运算符，右侧对象作为参数传入
-
-```c++
-class FOO {
-public:
-    bool operator<(const FOO& a) const {
-        return this->val < a->val;
-    }
-};
-```
-
-
-
 ### 7 C++字符串string🌼
 
 **string为动态字符串**，大小可变
@@ -1773,6 +1755,8 @@ class <派生类名>:<继承方式1><基类名1>, <继承方式2><基类名2>, �
 
 虚函数是在基类中使用关键字 virtual 声明的函数，在派生类中可以重写虚函数
 
+父类和子类都要virtual关键字修饰
+
 ```c++
 virtual returnTpye  funcname(parameters);	// 虚函数定义格式
 
@@ -1803,8 +1787,293 @@ virtual int Show() = 0; // 申明一个纯虚函数。
 
 
 
-### 12 虚函数(virtual functions)🌼
+## STL 标准模板库
 
-<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20210710230846777.png" alt="image-20210710230846777" style="zoom: 50%;" />
+### 1 C++标准库与STL
 
-对于虚函数，**父类和子类都要virtual关键字修饰**
+- C++标准库包含STL(Standard Template Library 标准模板库)，占标准库70%左右
+
+- STL采用**泛型编程**(GP Generic Programming)实现，
+
+- 泛型编程指用**Template(模板)为主要工具来编写程序**
+
+![image-20220720165245306](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720165245306.png)
+
+
+
+### 2 STL组成部件
+
+**STL的6大部件Components**
+
+- 容器 Containers，容器本身
+
+- 分配器 Allocators，负责内存管理
+- 算法 Algorithm，如查找算法、排序算法
+- 迭代器 Iterators，迭代器是一种泛化的指针
+- 仿函数 Functors，如less\<int>、greater\<int>
+- 适配器 Adapters，起“粘结”作用，包含容器适配器、迭代器适配器、仿函数适配器
+
+![image-20220720171341769](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720171341769.png)
+
+
+
+**STL全部容器遵循前开后闭原则**
+
+迭代器有效范围**[** .begin(), .end() **)**
+
+![image-20220720171519578](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720171519578.png)
+
+
+
+### 3 容器分类
+
+![image-20220720171740884](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720171740884.png)
+
+|                            |   分类名   |                  对应STL容器                  |
+| :------------------------: | :--------: | :-------------------------------------------: |
+|  **Sequence Containers**   |  顺序容器  | array vector string list deque priority_queue |
+| **Associative Containers** | 关联式容器 |                    map set                    |
+|  **Unordered Containers**  |  散列容器  |          unordered_map unordered_set          |
+
+
+
+### 4 OOP VS GP
+
+- OOP(Object Oriented Programming ) -- **面向对象编程**
+
+- GP(Generic Programming) -- **泛型函数编程**
+  - Generic 通用的、泛化的
+  - 通过Template实现
+
+- **OOP将datas和method关联在一起**
+- **GP将datas和method解耦**
+
+```c++
+using namespace std;
+
+unordered_set.find()					// OOP思想，调用unordered_set类中的find()函数
+::sort(vector.begin(), vector.end());	// GP思想，::sort()可以对不同数据类型进行排序
+```
+
+
+
+### 5 C++操作符重载
+
+- **C++用operator关键字**实现**操作符重载(Operator Overloading)功能**
+- operator和运算符一起使用，表示一个运算符重载函数
+- 可将operator和运算符（如operator<）**视为类的一个成员函数名**，调用时省去operator关键字
+- 运算符是左调用即**运算符左边的对象调用了运算符**
+  - **左侧对象的`this`指针**作为隐藏参数传入函数
+  - 对于单目运算符`++、--`，不需要传入其它参数
+  - 对于双目运算符`+、-、==、<`，**右侧对象作为参数传入**
+
+
+```c++
+class FOO {
+public:
+    // 重载Foo类的<运算符，第二个const用于修饰隐含的this指针
+    bool operator<(const Foo& obj) const {
+        return this->val < obj->val;
+    }
+    int val;
+};
+
+int main(void) {
+    Foo a, b;
+    if(a < b) {	// 相当于a调用了operator<函数，b作为参数传入
+        // ...
+    } 
+}
+```
+
+
+
+### 6 C++ 模板编程
+
+**C++模板编程通过template关键字实现**，分为**类模板、函数模板**
+
+- 用**`template <typename T>`**作为占位符，**T代表一种抽象的数据类型**
+  - **`template <class T>`**也可作占位符
+  - 类模板和函数模板行为一致
+- **实例化**模板类时需要用`<>`指定**模板具体类型**
+- T可以是C++标准数据类型，也可以是自定义的类，调用模板函数时，编译器会做**实参推导(argument deduction)**
+
+![image-20220720231019470](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720231019470.png)
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720231458905.png" alt="image-20220720231458905" style="zoom:50%;" />
+
+
+
+### 7 分配器allocators
+
+**分配器用于申请/释放容器空间**
+
+所有申请内存的操作都底层都是`malloc`和`free`
+
+![image-20220720180603530](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720180603530.png)
+
+
+
+### 8 迭代器 iterator
+
+- iterator是聪明的指针，**内部有很多重载和实现**
+
+- iterator指向的是容器节点，但**对*做了重载**，本来是取整个节点，变成取节点数据
+
+- **algorithm使用iterator访问iterator**
+
+
+
+**iteration分类**
+
+|                   |      名称      | 支持的操作（向下兼容） |                  对应容器                   |
+| :---------------: | :------------: | :--------------------: | :-----------------------------------------: |
+| **Random Access** | 随机访问迭代器 |        it += n         |            vector、string、deque            |
+| **Bidirectional** |   双向迭代器   |         ++ --          |               list、set、map                |
+|    **Forward**    |   前向迭代器   |           ++           | forward_list、unordered_set、unorderded_map |
+|      **Non**      |    无迭代器    |           \            |        stack、queue、priority_queue         |
+
+
+
+algorithm使用iterator时，**要求iterator回答5种associated type**，该能力**通过traitor实现**
+
+```c++
+typedef std::bidirectional_iterator tag iterator_category;	// 迭代器类型
+typedef T value_type;				// 值类型
+typedef T* pointer;					// 指针类型
+typedef T& reference;				// 引用类型
+typedef ptrdiff_t difference_type;	// 差值类型
+```
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720222218714.png" alt="image-20220720222218714" style="zoom: 67%;" />
+
+
+
+### 9 STL容器结构
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720180903329.png" alt="image-20220720180903329" style="zoom:80%;" />
+
+- **继承** -- C++子类继承基类的机制
+
+- **复合** -- 在B类中实例化A类以调用A类方法的做法，即**B类中拥有一个A类**
+
+
+
+
+
+### 10 vector容器
+
+- vector是一个**封装了动态数组的顺序容器**（Sequence Container），**初始容量为0**
+
+- vector对外表现为地址连续数组，**其底层元素也确实存储于连续数组中**
+
+- vector类只拥有 start finish end_of_storage 这3个成员变量
+- vector**尾添元素时间复杂度O(1)**，任意位置**insert元素时间复杂度O(n)**
+
+![image-20220720233557739](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720233557739.png)
+
+
+
+**vector扩容**
+
+- vector.size()=vector.capacity()时，继续向vector中添加元素，会**触发vector扩容**
+
+  - vector扩容时先**申请2 × capacity的大小的连续内存空间**
+
+  - 然后将vector中旧元素全部拷贝到新空间中
+
+  - 最后释放旧vector空间
+
+- vector扩容的时间复杂度均为O(n)，代价较高
+
+- 向空vector中连续尾添20个元素，vector.capacity()的数值变化
+
+![image-20220720235832192](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720235832192.png)
+
+
+
+### 11 list容器
+
+- list是一个**封装了双向链表的顺序容器**
+
+- 任意位置增删元素时间复杂度O(1)，但不支持随机访问
+
+![image-20220720235345402](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720235345402.png)
+
+
+
+
+
+
+
+
+
+### 12 deque容器
+
+deque双端队列是一种顺序容器，支持随机访问，**头/尾插、头/尾删的时间复杂度均为O(1)**
+
+![image-20220721003931922](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220721003931922.png)
+
+- **deque底层分段连续**，通过iterator的算法模拟，**对外表现为连续**
+- dequeue底层**采用两级存储结构**
+  - 表头(map)是一个vector，存储buffer指针
+  - **1个buffer的大小为512B**
+
+
+![image-20220721004250996](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220721004250996.png)
+
+### 13 stack容器 & queue容器
+
+stack栈和queue队列容器**底层均为deque**
+
+**stack和queue不允许遍历，也不提供迭代器**
+
+![image-20220721004646950](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220721004646950.png)
+
+
+
+### 14 set容器 & map容器
+
+- set和map**均为关联容器**，底层**基于rb_tree实现**，**内部有序**
+
+- **增删改查时间复杂度O(logn)**，内置find()成员函数
+
+- **map对 operator[] 进行了重载**
+  - 如果key存在，则以引用的方式返回key对应的value值
+  - 如果key不存在，**则插入该key，并赋值**
+
+```c++
+map <int,string> m;
+m[1] = "hello";		// 如果键值1存在，则修改其data为"hello"
+					// 如果不存在，则先插入键值与valuse默认值组成的kv对，再修改value为"hello"
+```
+
+
+
+### 15 unordered_set容器 & unordered_map容器
+
+unordered_set和unordered_map**均为散列容器**，底层**基于hashtable实现**，内部无序
+
+**增删改查时间复杂度O(1)**，内置find()成员函数
+
+
+
+**hashtable中的数据最终存储于vector中**
+
+- 调用哈希函数获取key对应哈希值
+- 采用除留取余法获取value在vector中的下标
+- 下标冲突时，采用链接地址解决
+
+
+
+**rehash 打散**
+
+- 当元素总数=数组大小时触发打散操作，**保证每个bucket平均存放的元素不及1个**
+
+- 需要**将vector扩容至最接近原size()2倍的质数**，并重新计算存储位置
+
+- GNU库初始bucket数目为53，扩充时查表
+
+![image-20210707222705787](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20210707222705787.png)
+
+
