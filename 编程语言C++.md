@@ -1787,7 +1787,7 @@ virtual int Show() = 0; // 申明一个纯虚函数。
 
 
 
-## STL 标准模板库
+## STL标准模板库
 
 ### 1 C++标准库与STL
 
@@ -2075,5 +2075,447 @@ unordered_set和unordered_map**均为散列容器**，底层**基于hashtable实
 - GNU库初始bucket数目为53，扩充时查表
 
 ![image-20210707222705787](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20210707222705787.png)
+
+## C++库函数🌼
+
+### A
+
+
+
+### B
+
+
+
+### C
+
+
+
+### D
+
+
+
+### E
+
+
+
+### F
+
+#### floor()	ceil()	round() 取整函数🌼
+
+```c++
+#include <cmath>
+floor(4.3) = 5;	// 向下取整
+ceil(4.8) = 4;	// 向上取整
+round(4.4) = 4;	// 四舍五入
+round(4.5) = 5；
+```
+
+
+
+
+
+
+
+### G
+
+#### gcvt() 浮点数转C风格字符串🌼
+
+```c++
+char *gcvt(double value, int ndigit, char *buf);
+
+char volValue[100] = {0};
+float num = 80.56;
+gcvt(num, 10, volValue);	// volValue = "80.55999756"
+```
+
+- value：浮点数
+- ndigit：精度位数
+- buf：输出字符串指针
+
+
+
+
+
+
+
+
+### H
+
+
+
+### I
+
+####  INT_MAX和INT_MIN🌼
+
+int类型上下界，-2147483648到2147483647 
+
+```c
+#include<limits.h>
+
+#define INT_MAX 2147483647
+#define INT_MIN (-INT_MAX - 1)
+```
+
+
+
+#### isalnum() 判断字符是否为数字/字母🌼
+
+数字/字母范围 **0-9|| a-z || A-Z**
+
+```c++
+int isalnum(int c);
+
+char value = '9';
+int res = isalnum(value);	// 实测返回值为8（非零值）
+```
+
+- c是数字/字母，则**返回非零值**，否则返回 0
+
+
+
+### J
+
+
+
+### K
+
+
+
+### L
+
+
+
+### M
+
+#### memset() 内存填充指定字符🌼
+
+memset()用于填充字符 c 到参数 str 所指向地址的前 n 个字符
+
+```c++
+#include <string.h>
+
+void *memset(void *str, int c, size_t n)
+```
+
+- str -- 指向要填充的内存块
+- c -- 要被设置的值。该值以 int 形式传递，**实际以char形式填充**
+- n --  要被设置为该值的字符数
+
+memset**以字节为单位填充**
+
+通常用于**内存清零**（**各种类型的数组、结构体均适用**）
+
+```c++
+int nums[100];
+memset(nums, 0, sizeof(nums));		// 将nums之后的400Byte全部置0，得到100个(int)0
+```
+
+除清零外**只能用于**char数组赋值，或int数组置-1（邪教用法）
+
+```c++
+char str[100];
+memset(str, 'a', sizeof(str));		// 正确赋值100个(char)‘a’
+
+int nums[100];
+memset(nums, -1, sizeof(nums));		// 正确赋值100个(int)-1，实际上是赋值了400个1111111（-1补码）
+
+memset(nums, 5, sizeof(nums));		// 错误用法，无法得到100个(int)5
+```
+
+
+
+#### memcpy() 拷贝缓冲区🌼
+
+```c++
+void *memcpy(void *dst, const void *src, size_t n)
+```
+
+- str1 -- 指向用于存储复制内容的目标数组，类型强制转换为 void* 指针。
+
+- str2 --  指向要复制的数据源，类型强制转换为 void* 指针。
+
+- n -- 要被复制的字节数。
+
+
+
+### N
+
+
+
+### O
+
+
+
+### P
+
+#### perro()打印错误信息 & exit()终止线程🌼
+
+**perror()** -- **用于打印错误信息**，并输出到stderr(标准错误)
+
+```c++
+void perror ( const char * str );
+    
+pFile=fopen ("unexist.ent","rb");
+if (pFile==NULL)
+perror ("The following error occurred");
+
+//输出结果
+//The following error occurred: No such file or directory
+```
+
+errno是**errno.h** 头文件定义的整数变量，其值描述了调用库函数时产生的**错误条件或诊断信息**（提示信息）
+
+**库函数都可以对其改写**，用于标识错误类型
+
+
+
+**exit()** -- **终止当前线程**
+
+```c++
+void exit (int status);
+
+exit(0);	//正常退出	EXIT_SUCCESS 0
+exit(1);	//异常退出	EXIT_FAILURE 1
+```
+
+
+
+
+
+
+
+### Q
+
+
+
+### R
+
+
+
+### S
+
+#### sprintf() 输出至格式化数据至Cstring🌼
+
+```c++
+int sprintf ( char * str, size, const char * format, ...);
+sprintf(str, "My name is %s, I'm from %s.", "FengGuo", "China");	// str被赋值为："My name is FengGuo, I'm from China."
+```
+
+- str -- 目标字符串。
+
+- format -- 格式化成字符串。
+
+- **`...`** -- **可变参数**
+
+
+
+#### ::stable_sort() 稳定排序🌼
+
+```c++
+void stable_sort ( RandomAccessIterator first, RandomAccessIterator last);					// 默认升序
+void stable_sort ( RandomAccessIterator first, RandomAccessIterator last, Compare comp);	// 指定比较方式
+
+vector<Restaurants> sortedRes;
+::stable_sort(sortedRes.begin(), sortedRes.end(), idCmp);
+```
+
+内部基于归并排序实现
+
+
+
+#### strcmp() & string::compare() 字符串比较
+
+strcmp() -- **C风格字符串比较**
+
+- 返回值 < 0，str1字典序小于str2
+- 返回值 = 0，str1与str2相同（**核心用法**）
+- 返回值 > 0，str1字典序大于str2
+
+```c++
+int strcmp(const char* str1，const char* str2);
+
+char str1[15];
+char str2[15];
+strcpy(str1, "abcdef");			// can not use =
+strcpy(str2, "ABCDEF");
+int ret = strcmp(str1, str2);	// ret > 0
+```
+
+
+
+string::compare()：**STL string比较**
+
+- 返回值 < 0，str1字典序小于str2
+- 返回值 = 0，str1与str2相同（**核心用法**）
+- 返回值 > 0，str1字典序大于str2
+
+```c++
+int compare (const string& str) const;
+
+string str1 = "abcdef";
+string str2 = "ABCDEF";
+int ret = str1.compare(str2);		// ret > 0;
+```
+
+
+
+
+
+### T
+
+
+
+### U
+
+
+
+### V
+
+
+
+### W
+
+
+
+### X
+
+
+
+### Y
+
+
+
+### Z
+
+
+
+
+
+
+
+### 数字/字符串互转API🌼
+
+**a -- alphanumeric(字母数字)**
+
+
+
+#### atof() Cstring转浮点数🌼
+
+```c++
+double atof(const char *nptr);
+    
+char szRecvBuff[100] = "12.2"; 
+double current = atof(szRecvBuff);	// current = 12.2
+```
+
+- nptr -- **字符串输入**，支持`123.	12.3	0.12	1.23E4`等格式
+
+
+
+#### atoi()  Cstring转整数🌼
+
+```c++
+int atoi(const char *nptr)
+    
+char szRecvBuff[100] = "12absd"; 
+int current = atof(szRecvBuff);		// current被赋值为12（前2个有效数字）
+```
+
+- nptr -- **字符串输入**
+
+
+
+#### stof() std::string转浮点数🌼
+
+```c++
+float stof (const string&  str, size_t* idx = 0);
+    
+string s = "12.2asdf"; 
+float current = stof(s);	// current被赋值为12.2
+```
+
+- **str -- 字符串输入**，支持`123.	12.3	0.12	1.23E4`等格式
+
+
+
+#### stoi() std::string转整数🌼
+
+```c++
+int stoi (const string&  str, size_t* idx = 0, int base = 10);
+    
+string s = "67asdf"; 
+int current = stoi(s);	// current被赋值为67
+```
+
+- **str -- 字符串输入**
+- base -- 进制
+
+
+
+#### to_string() 数字转std::string🌼
+
+```c++
+string to_string (int val);
+string to_string (long val);
+string to_string (long long val);
+string to_string (unsigned val);
+string to_string (unsigned long val);
+string to_string (unsigned long long val);
+string to_string (float val);
+string to_string (double val);
+string to_string (long double val);
+
+int value = 12;
+string str = to_string(value);		// str = "12";
+```
+
+
+
+### 字符串の骚操作🌼
+
+#### strchr() Cstring字符查找🌼
+
+```c++
+char *strchr(const char *str, int c);
+    
+char s[] = "12+8i";
+int real = atoi(s);			// 提取实部	real=12
+char* p = strchr(s, '+');	// 找到 + 位置
+int img = atoi(p+1);		// 利用查找到的p提取虚部	img=8
+```
+
+- str：要被检索的 C 字符串
+- c：在 str 中要搜索的字符
+- 如找到，返回在c在字符串中**第一次出现的地址**
+- 如未找到，返回nullptr
+
+
+
+#### find() std::string字符查找🌼
+
+```c++
+size_t string::find (char c, size_t pos = 0);         // 查找字符串[pos, end)范围内第一次出现c的位置
+
+string s = "12+8i";
+int real = stoi(s);					// 提取实部	real=12
+int pos = s.find('+');				// 找到 + 位置
+int img = stoi(s.substr(pos+1));	// 利用查找到的p提取虚部	img=8
+```
+
+- c -- 待查找字符
+- pos -- 查找起始位置
+- 如找到，返回在c在字符串中**第一次出现的下标**
+- 如未找到，**返回-1**
+
+
+
+#### substr() 获取子串🌼
+
+```c++
+string s = "I'm Zhu Wan Dong";
+string name = s.substr(4);		// name = "Zhu Wan Dong"
+```
+
+
 
 
