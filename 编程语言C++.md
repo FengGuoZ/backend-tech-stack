@@ -1444,19 +1444,23 @@ C++同时也**对部分C头文件进行了标准化**
 
 **C++头文件命名**
 
-**C++标准库的头文件不带副文档名(.h)**
+- **C++标准库的头文件不带副文档名(.h)**
+  - #include <vector>
 
-- #include <vector>
 
-**C++标准化后的C头文件带c字母前缀**
+- **C++标准化后的C头文件带c字母前缀**
 
-- #include <stdio> -> <cstdio>
-- #include <math> -> <cmath>
+  - #include <stdio> -> <cstdio>
 
-**C标准头文件保留，带副文档名(.h)**
+  - #include <math> -> <cmath>
 
-- 为了完全兼容C标准
-- #include <string.h>
+
+- **C标准头文件保留，带副文档名(.h)**
+
+  - 为了完全兼容C标准
+
+  - #include <string.h>
+
 
 
 
@@ -1505,7 +1509,9 @@ C++中struct结构体的可以有函数函数
 
 
 
-#### 3.2 面向对象编程 OOP（Object Oriented Programming ）
+#### 3.2 面向对象编程 OOP
+
+OOP -- Object Oriented Programming
 
 - 类是一个通用的抽象概念， C++、Java、C#、PHP 等语言都支持类和对象，这些语言**被称为面向对象的编程语言**
 
@@ -1514,11 +1520,7 @@ C++中struct结构体的可以有函数函数
 
 
 - C++中在函数的基础上，多了一层封装，就是类（class）
-- class的引入**使得C++具备了面向对象编程的3大特性：封装、继承、多态**
-
-
-
-#### 3.3 封装、继承、多态
+- class的引入**使得C++具备了面向对象编程的3大特性 -- 封装、继承、多态**
 
 
 
@@ -1819,7 +1821,7 @@ virtual int Show() = 0; // 申明一个纯虚函数。
 
 **STL全部容器遵循前开后闭原则**
 
-迭代器有效范围**[** .begin(), .end() **)**
+迭代器有效范围**[ .begin(), .end() )**
 
 ![image-20220720171519578](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720171519578.png)
 
@@ -1888,15 +1890,15 @@ int main(void) {
 
 
 
-### 6 C++ 模板编程
+### 6 C++ Template模板编程
 
 **C++模板编程通过template关键字实现**，分为**类模板、函数模板**
 
 - 用**`template <typename T>`**作为占位符，**T代表一种抽象的数据类型**
   - **`template <class T>`**也可作占位符
-  - 类模板和函数模板行为一致
-- **实例化**模板类时需要用`<>`指定**模板具体类型**
-- T可以是C++标准数据类型，也可以是自定义的类，调用模板函数时，编译器会做**实参推导(argument deduction)**
+  - T可以是C++标准数据类型，也可以是自定义的类
+- 调用函数模板时，编译器自动做**实参推导**(argument deduction)，**无需手动指定类型**
+- 类模板需要在使用时**手动指定模板类型**（即<>中的T）
 
 ![image-20220720231019470](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220720231019470.png)
 
@@ -2515,6 +2517,761 @@ int img = stoi(s.substr(pos+1));	// 利用查找到的p提取虚部	img=8
 string s = "I'm Zhu Wan Dong";
 string name = s.substr(4);		// name = "Zhu Wan Dong"
 ```
+
+
+
+## C++知识点收集
+
+### 001 C++函数缺省值🌼
+
+**函数声明时可以有**缺省(默认)值
+
+**定义时不可以有**缺省值。
+
+```c++
+void Rand(int minvalue, int maxvalue, int totalcount, bool brep=true);	// 申明时可缺省合法
+void Rand(int minvalue, int maxvalue, int totalcount, bool brep) {		// 定义时不可缺省
+	//To Do SMT
+}
+```
+
+
+
+### 002 生存期 作用域 可见性🌼
+
+**生存期 -- 变量在内存中存在的时间区间**
+
+- 局部变量 -- [定义位置, 出作用域位置]，局部变量出作用域后被操作系统自动回收
+- 全局变量 -- 与程序生存期同步
+- 堆变量 -- [new位置, delete位置]，堆变量需手动申请/释放
+
+
+
+**作用域 -- 变量的有效范围**
+
+- **全局作用域** -- 全局可见，如全局变量
+- **文件作用域** -- 仅当前文件可见，如static修饰的全局变量
+- **函数作用域** -- 函数内部的局部变量
+- **块作用域** -- {}内
+
+
+
+**可见性 -- 变量在其作用域内可见**（可以被使用）
+
+
+
+### 003 static关键字🌼
+
+static是C/C++中的关键字，**用于改变变量的存储方式和可见性**
+
+
+
+#### 3.1 static修饰局部变量
+
+- static 告知编译器，**将局部变量存储静态区而非栈上空间**
+- static**延长了局部变量的生命周期**，直到主程序运行结束才释放
+- static修饰的局部变量**只执行初始化一次**，**并具有“记忆”功能**
+  - 静态局部变量**第一次调用时初始化并分配静态区内存**
+  - 第i次调用子函数时的static变量值，继承第i-1次调用子函数结束时的static变量值
+
+```c++
+void selfCout(){
+  // static int i = 0;
+  int i = 0;
+  cout << i << endl;
+  i++;
+}
+
+int main(int argc, char *argv[]) {
+  for (int ii = 0; ii < 10; ii++) {
+    selfCout();
+  }
+
+  return 0;
+}
+```
+
+
+
+#### 3.2 static 修饰全局变量
+
+- 静态全局变量**具有文件作用域**，不能在其它文件中访问，即使extern外部声明也不可以
+
+- 可用作**保护数据安全性的方法**
+
+
+
+#### 3.3 在类中使用static
+
+**类静态变量**
+
+- static修饰的类成员变量称为**类静态变量**
+
+- 类静态变量**脱离类实例对象存在**
+  - 可以通过**类名::变量名**直接引用
+
+  - **类静态变量为类所有**，不属于类实例对象
+
+- 类静态变量**类内申明，类外定义**
+  - 类内只是申明类静态变量
+  - 类静态变量使用前**必须在类外初始化**，此过程**在编译阶段完成**
+
+
+
+**类方法**
+
+static修饰的类成员函数称为**类方法**
+
+- 类方法可以通过**类名::方法名**直接调用
+- **类方法无this指针，为所有对象共享**
+
+- 类变量为类本身和所有类对象所**共有**。
+
+```c++
+class staticTest{
+public:
+  staticTest() {};
+
+  static void ifoCout(){		// 类静态方法
+      cout << "It's a static class funC" << endl;
+  }	
+  static int sValue;			// 类静态变量 类内申明
+};
+
+int staticTest::sValue = 824; 	// 类外定义、初始化
+
+int main(int argc, char *argv[]){
+  staticTest::ifoCout();	//直接用类名调用类方法
+  cout << staticTest::sValue << endl;//直接用类名调用类变量
+
+  return 0;
+}
+```
+
+
+
+### 004 C++格式控制符🌼
+
+| 控制符 |             含义             |
+| :----: | :--------------------------: |
+|   %d   |             整数             |
+|   %u   |          无符号整数          |
+|  %lf   |          double输出          |
+|   %s   |       C风格字符串输出        |
+|   %p   | 十六进制显示地址（含0x前缀） |
+
+
+
+### 005 typedef & struct关键字🌼
+
+**struct**关键字用于定义结构体
+
+```c++
+struct 结构体名{
+    // 结构体所包含的变量或数组
+};
+
+struct BiTNode{
+  char data;
+  struct BiTNode *lchild;
+  struct BiTNode *rchild;
+};
+```
+
+
+
+**typedef**关键字用于为类型起别名
+
+```c++
+typedef struct BiTNode BiTNode;	// 使BiTNode和struct BitNode等价
+typedef struct BiTNode *BiTree;	// 使BiTree和struct BitNode*等价
+```
+
+
+
+**typedef和struct组合使用，定义结构体的同时起别名**
+
+```c++
+typedef struct BiTNode{
+  char data;              	// 存放结点的数据元素。
+  struct BiTNode *lchild; 	// 指向左子结点地址的指针。
+  struct BiTNode *rchild; 	// 指向右子结点地址的指针。
+} BiTNode, *BiTree;
+```
+
+
+
+### 006 数值常量INT_MIN DBL_MIN DBL_EPSILON🌼
+
+**INT_MIN INT_MAX**
+
+int类型上下界，**[-2147483648 = -2^31, 2147483647 = 2^31-1]**
+
+```c
+#include<limits.h>
+
+#define INT_MAX 2147483647
+#define INT_MIN (-INT_MAX - 1)	// -0
+```
+
+
+
+**DBL_MIN DBL_MAX**
+
+int类型上下界，**[2.22507e-308, 1.79769e+308]**(-2^31 到 2^31-1)
+
+```c++
+#include <cfloat>
+
+#define DBL_MAX		__DBL_MAX__
+#define DBL_MIN		__DBL_MIN__
+```
+
+
+
+
+
+**DBL_EPSILON**
+
+double类型精度，具体值为<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220722215153830.png" alt="image-20220722215153830" style="zoom:25%;" />
+
+```c++
+// 判断浮点数相等
+abs(f1 - f2) < DBL_EPSILON	// 正确做法
+f1 == f2;					// 错误做法,会引发逻辑错误
+```
+
+
+
+
+### 007 指针的内存大小🌼
+
+指针大小**由操作系统决定**，**与指向的数据类型无关**
+
+- **32位系统下为4字节**
+- **64位系统下为8字节**
+
+
+
+
+### 008 函数指针🌼
+
+函数指针是**用于存放函数地址的指针**
+
+- 函数名本质上就是一个函数指针常量
+
+- **函数类型指返回值和参数列表**
+
+  - 与函数名、形参名无关
+
+  - 函数指针声明格式 -- **`returnType (*指针名)(参数列表);`**
+
+- 函数指针**可作为输入/输出参数使用**，例如回调函数中的函数指针变量，用户可以传入同类型自定义函数
+
+```c++
+int func(int a, string s) {			// func是一个函数指针常量
+    // ...
+}
+
+int main(void) {
+    int (*p)(int, string) = NULL;	// 声明函数指针变量p
+    p = func;						// 赋值
+    p(a, s);						// 通过函数指针调用函数
+    
+    return 0；
+}
+```
+
+
+
+
+### 009 struct VS class🌼
+
+在C语言中，struct 只能包含成员变量，不能包含成员函数（**C不是面向对象的1个体现**）
+
+在C++中，struct 类似于 class，**既可以包含成员变量，又可以包含成员函数**
+
+- class成员**默认private**属性；struct成员**默认public属性**
+- class继承**默认private继承**；struct继承**默认public继承**
+- **class 可以使用模板**（template，泛型编程）， struct 不能
+
+
+
+### 010 内存高低地址 & 变量的高低位 & 大小端法🌼
+
+- **高地址**：地址编号值大；`0x10c9a88`
+- **低地址**：地址编号值小；`0x10c9a78`
+  - 动态分配内存时**堆空间向高地址增长**
+  - **栈空间向低地址增长**
+- **变量高低位**：左高右底
+
+- **大端法**：**用高地址存储变量低位**、用低地址存储变量高位
+- **小端法**：反之；弟（低地址）弟（变量低位）小（小端法）
+
+
+
+### 011 指针常量和常量指针🌼
+
+**指针常量** -- 指针本身是常量，不可以改变指针指向的对象
+
+```c++
+int *const p = &a;	// const修饰p
+p = &b;				// 不允许
+*p = 10;			// 可以
+```
+
+**常量指针** -- 指针指向的是常量，不可以通过指针改变指向的值
+
+```c++
+const int *p = &a;	// const修饰int
+p = &b;				// 可以
+*p = 10;			// 不允许
+```
+
+
+
+### 012 类成员变量的声明与定义🌼
+
+**类内只是申明变量**
+
+类实例化时才定义对象，正式分配内存空间
+
+
+
+### 013 C++自定义比较器🌼
+
+**C++比较器详解**
+
+- ::sort默认**less\<int>()**比较器，对应升序排列
+
+  - 特别注意堆结构同样默认**less\<int>()** ，**但对应大根堆**
+
+- 排序起到的效果是**把排序后的元素按位置先后输入到比较器中，输出都为true**
+
+- sort需要的输入为**less\<int>()** or **StrCmp()**
+
+- set等容器需要的输入为**less\<int>** or **StrCmp**
+
+
+
+**3种C++比较器**
+
+- **重载 < 运算符**
+
+```c
+struct Str{
+    string s;
+    bool operator < (const Str &str) const {
+        return this->s.length() < str.s.length();
+    }
+};
+
+vector<Str> strs;
+::sort<strs.begin(), strs.end());	// 将Str按短->长排序
+```
+
+- **函数比较器**
+
+```c
+bool strShorterCmp(const Str str1, const Str str2){
+    return str1.length() < str2.length();
+}
+
+vector<Str> strs;
+::sort<strs.begin(), strs.end(), strShorterCmp);	// 将Str按短->长排序
+```
+
+- **类比较器**，需重载**operator()**运算符
+
+```c++
+class StrCmp{
+public:
+	bool operator()(Str s1, Str s2){
+        return s1.s.length() < s2.s.length();
+    }
+};
+
+vector<Str> strs;
+::sort<strs.begin(), strs.end(), StrCmp());	// 将Str按短->长排序，注意这里给的类成员函数
+set<Str, Strcmp>;							// 创建Str的set对象，注意这里给的是类本身
+```
+
+
+
+
+### 014 前向声明🌼
+
+**前向声明**(forward declare) -- **在定义类之前先声明**
+
+- 适用于**类之间相互包含**的情况
+
+
+- 例如TinyWebServer中，util_timer类和client_data类为一一对应关系，各自包含1个对方类型的成员变量
+
+```c++
+class Edge; //前向申明Edge
+
+class Node{
+public:
+	/* */
+    vector<Edge> edges; // 用到了Edge类
+    /* */
+};
+
+class Edge{
+public:
+    /* */
+    Node from;  // 用到了Node类
+    Node to;    // 终点
+    /* */
+};
+```
+
+
+
+### 015 线程锁竞争🌼
+
+**锁机制用于在多线程程序中保护临界区资源**
+
+- A线程加锁1后，**B线程申请同一把锁1则会被阻塞**
+
+- 是否阻塞**以是否申请同一把锁为标准**，不以是否存在相同的临界区资源为标准
+  - B线程不申请锁1则不会阻塞
+  - B线程申请锁2也不会阻塞
+
+
+
+### 016 vector手动分配内存🌼
+
+**初始化时分配**
+
+```c++
+vector<int> foo(10);		// 指定初始大小，不指定值（编译器默认填充0）
+vector<int> foo1(20, 4); 	// 指定初始大小和值
+```
+
+**初始化后分配** -- resize()
+
+```c++
+foo.resize(10);		// 重设大小，扩大的部分默认填充0
+foo.resize(10, 6);	// 重设大小，扩大部分填充为指定值
+```
+
+
+
+### 017 STL operator[] & operator<
+
+**operator[] 成员访问**
+
+- 支持的容器：**vector、string、dequeue、map、unordered_map**
+  - map、unordered_map有则返回second值，无则插入键，同时可以赋值
+
+
+
+**operator= 严格深拷贝容器**
+
+- 支持的容器：**vector**、**deque**、**forward_list**、**list**、**set**、**map**、**unordered_set**、**unorderded_map**
+  - **有迭代器的都支持**
+- 不支持的容器：**stack**、**queue**、**priority_queue**
+  - **没有迭代器的不支持**
+
+
+
+
+
+### 018 STL容器内存占用🌼
+
+**STL容器本身占用一定的内存**
+
+- 内存大小**与操作系统位数有关**，与容器内**存放数据的数量\类型无关**
+
+  - vector**本身拥有**三个迭代器 **start**、**finish**、**end_of_storage**
+
+  - **迭代器是特化的指针**，所以 vector 本身大小为 **24Byte**
+
+
+![image-20211202155905992](E:\ShareFile\C++后端技术栈\编程语言.assets\image-20211202155905992.png)
+
+- STL容器本身大小统计（**64位环境实测**）
+  - 所有容器本身大小**均为 8B 的整数倍**
+  - string 本体 32Byte（竟然这么大）
+  - deque、queue、stack 本体大小**同为 80**，进一步验证了queue、stack不过是**功能阉割了的 deque**
+  - forward_list本体怕不是就1个裸迭代器（2333）
+
+|      |      容器      | 本身大小 |
+| :--: | :------------: | :------: |
+|  1   |     string     |  【32】  |
+|  2   |     vector     |  【24】  |
+|  3   |      list      |    24    |
+|  4   |  forward_list  |    8     |
+|  5   |     deque      |  【80】  |
+|  6   |     queue      |  【80】  |
+|  7   |     stack      |  【80】  |
+|  8   | priority_queue |    32    |
+|  9   |      set       |    48    |
+|  10  |      map       |    48    |
+|  11  | unordered_set  |    56    |
+|  12  | unordered_map  |    56    |
+
+
+
+### 019 同步和异步🌼
+
+**线程中的同步与异步**
+
+- **同步线程**：当程序1调用程序2时，**程序1停下不动**，直到程序2完成回到程序1来，程序1才继续执行下去
+  - 好兄弟，我等你!
+- **异步线程**：当程序1调用程序2时，**程序1径自继续自己的下一个动作**，不受程序2的的影响
+  - 好兄弟，我先溜了！
+
+**IO中的同步与异步**
+
+- **同步IO**：发送方发出数据后，**等接收方发回响应**以后才发下一个数据包的通讯方式 
+- **异步IO**：发送方发出数据后，**不等接收方发回响应**，接着发送下个数据包的通讯方式
+- 举例：socket属性中，如果屏蔽naggle算法，则为异步IO
+
+**linux下的信号是异步的**，因为**基于中断实现**，无法确定回调型号处理函数时，主线程的上下文位置
+
+
+
+### 020 运算符优先级🌼
+
+|                          |   优先级别   |                   实例                    |
+| :----------------------: | :----------: | :---------------------------------------: |
+|      **算数运算符**      |    3-4 级    |               **+ - * / %**               |
+|      **移位运算符**      |     5 级     |                 **<< >>**                 |
+| **比较运算符【分水岭】** |    6-7 级    |           **> = < >= <= == !=**           |
+|       **位运算符**       |   8-10 级    |                **& \| ^**                 |
+|      **逻辑运算符**      |   11-12级    | **&& \|\|**<br />**特例 ~** 单目运算，2级 |
+|      **赋值运算符**      | 14级（极低） |                   **=**                   |
+
+
+
+**易错点在于容易被连用的判断运算符**，连用时才有优先级的问题
+
+尤其注意**位运算符**、**赋值运算符**优先级**小于比较运算符**
+
+```c++
+// & 与 <
+// 正确写法
+if((bitMap[ii] & bitMap[jj]) == 0){ // 位图没有同一个位为 1 的情况出现
+    ans = max((int)words[ii].size() * (int)words[jj].size(), ans);
+}
+
+// = 与 <
+// 正确写法
+if ((listen_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) 
+        ERR_EXIT("socket()");
+// 错误写法，会导致listen_sock没有正确赋值
+if (listen_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) < 0) 
+        ERR_EXIT("socket()");
+```
+
+
+
+### 021 extern关键字🌼
+
+**extern关键字用外部变量**
+
+- 在a.c文件中**全局区定义变量foo**，具备全局可见性
+- b.c可以通过 **extern** 声明，直接访问 **foo**
+
+```c++
+// b.c
+int main(void){
+    extern int foo;			// 外部声明
+    cout << foo <<endl;
+    
+    return 0;
+}
+```
+
+
+
+### 022 STL哈希表支持的数据类型🌼
+
+哈希表**直接支持的类型**
+
+- char、int、double等内置基础类型
+- **指针型**
+- string
+
+
+
+哈希表**不直接支持**
+
+- **vector\<int>**
+
+- **pair<int, int>**
+
+- 直接使用会报错：`错误    C2338    The C++ Standard doesn't provide a hash for this type.`  
+
+- 需要**额外配置hash方法**
+
+  ```c++
+  // vector<int> 所需的哈希方法
+  struct VectorHash {
+      size_t operator()(const std::vector<int>& v) const {
+          std::hash<int> hasher;
+          size_t seed = 0;
+          for (int i : v) {
+              seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+          }
+          return seed;
+      }
+  };
+  ```
+
+
+
+
+
+### 023 C++在A.cpp中调用B.cpp定义的函数🌼
+
+**创建头文件并包含**
+
+- 创建B.hpp，声明函数foo
+- 在B.cpp中定义foo
+- A.cpp中inlcude<B.hpp>，则foo可以在A.cpp中调用
+
+
+
+**extern申明外部函数**（全局函数也具有**全局作用域**）
+
+- 在B.cpp中定义foo
+- 在A.cpp中 extern foo() 申明后即可调用
+
+
+
+### 024 派生类的访问权限
+
+**派生类访问权限**
+
+- 派生类可以**访问基类中所有非private成员**
+- 派生类可以**访问基类中所有非private函数**
+- 派生类访问权限**与继承方式无关**
+
+```c++
+class A {
+public:
+	int n;
+private:
+	int m;
+};
+
+class B : public A {			// public继承
+public:
+	void f1() { 
+		cout << n << endl; 		// 可以访问
+		// cout << m << endl; 	// 不可访问：note: declared private here
+		return ;
+	}
+};
+```
+
+
+
+### 025 C++异常处理 throw try catch
+
+C++程序运行时可能出现异常情况，如内存溢出、文件打开失败，如果不及时处理异常，可能会导致程序崩溃，所以**引入C++异常处理机制**
+
+
+
+- **C++通过throw + try...catch实现异常处理**
+
+  - throw为关键字
+  - **catch块个数 ≥ 1**
+
+  - 异常类型可以是基本/自定义数据类型
+
+  - 能够**捕获任何异常**的catch(...)语句（类比switch-default）
+
+```c++
+try {
+	// ...
+    throw 表达式;	// 抛出异常 throw为C++关键字
+} catch(异常类型) {
+	// ...
+}
+
+catch(...) {	// 能够捕获任意异常 一般是最后一个catch块
+    
+}
+```
+
+- try...catch**语句执行过程**
+
+  - try块中未抛出异常，则**跳过catch语句块继续执行**
+
+  - try块中抛出异常类型，**转到第一个匹配异常类型i的catch块中执行**
+
+- 异常**若在本函数中未被处理**，会**层层上抛给调用者**
+
+  - 若抛到main函数中仍未被处理，则**程序立即异常终止**
+
+```c++
+// divid函数异常处理实例
+int divid(vector<int>& vec, size_t i, size_t j) {
+    try {
+        if(i<0 || i>=vec.size() || j<0 || j>=vec.size())	// 内存越界
+            throw 1;	// 抛出异常
+        if(vev[j] == 0)	// 除数为0
+            throw 2;	// 抛出异常
+    } catch(int e) {	// 异常类型匹配，异常值传入e
+        if(e == 1) {
+            cout << "out-of-range" << endl;
+        }
+        if(e == 2) {
+            cout << "can't divid 0" << endl;
+        }
+        
+        return -1;
+    } catch(...) {	// default处理
+        cout << "unknow error" << endl;
+        return -1;
+    }
+    
+    return vec[i] / vec[j];	// 无异常时执行
+}
+```
+
+
+
+**C++标准异常类** -- 由exception基类派生，用于规范异常
+
+```c++
+class exception {
+public:
+  exception() _GLIBCXX_USE_NOEXCEPT { }
+  virtual ~exception() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
+  /** Returns a C-style character string describing the general cause
+   *  of the current error.  */
+  virtual const char*
+  what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
+}
+```
+
+**派生关系**
+
+- bad_cast：强制类型转化异常
+- bad_alloc：new操作异常（没有足够堆空间）
+- out_of_range：数组下标越界
+
+![image-20220723000051135](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220723000051135.png)
+
+
+
+### 026 STL对pair<int, int>的支持
+
+- vector支持 **vector<pair<int, int>>**
+- 堆结构支持 **priority_queue<pair<int, int>>**，默认大根堆
+
+- **STL内置pair<int, int>类型的比较器**
+  - 默认升序：**less<pair<int, int>>()**
+  - 降序：greater<pair<int, int>>()
+
+
+
 
 
 
