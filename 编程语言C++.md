@@ -2114,7 +2114,20 @@ round(4.5) = 5；
 
 
 
+#### find()
 
+**string.find()**
+
+```c++
+size_t find (const string& str, size_t pos = 0) const;	// pos 用于指定查找位置
+
+string s1 = "apple";
+size_t idx = s1.find("pl");	// idx = 2
+```
+
+- 返回值为**首次找到 str 的字符下标**
+
+- 查找失败，返回**string::npos**，`static const size_t npos = -1;`
 
 
 
@@ -2423,7 +2436,7 @@ char szRecvBuff[100] = "12absd";
 int current = atof(szRecvBuff);		// current被赋值为12（前2个有效数字）
 ```
 
-- nptr -- **字符串输入**
+- nptr -- **C风格字符串输入**
 
 
 
@@ -2447,9 +2460,18 @@ int stoi (const string&  str, size_t* idx = 0, int base = 10);
     
 string s = "67asdf"; 
 int current = stoi(s);	// current被赋值为67
+
+// 日期提取 "1998/8/24"
+size_t index;					// 注意类型
+int year = stoi(date, &index);	// index=4
+date = date.substr(index+1);	// date="8/24"
+int month = stoi(date, &index);	// index=1
+date = date.substr(index+1);	// date="24"
+int day = stoi(date);
 ```
 
 - **str -- 字符串输入**
+- idx 是 str 中有效数字转化后的**下一位**
 - base -- 进制
 
 
