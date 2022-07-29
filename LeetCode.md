@@ -365,7 +365,7 @@ Info foo(...){
 
 
 
-## ACM IO指北
+### ACM IO指北
 
 #### std::cin
 
@@ -415,5 +415,4 @@ while(cin >> s) {			// 读取到EOF时自动跳出
     // ...
 }
 ```
-
 

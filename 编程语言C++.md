@@ -2263,7 +2263,7 @@ void *memcpy(void *dst, const void *src, size_t n)
 
 ### P
 
-#### perro()打印错误信息 & exit()终止线程🌼
+#### perror()打印错误信息 & exit()终止线程🌼
 
 **perror()** -- **用于打印错误信息**，并输出到stderr(标准错误)
 
@@ -2277,10 +2277,6 @@ perror ("The following error occurred");
 //输出结果
 //The following error occurred: No such file or directory
 ```
-
-errno是**errno.h** 头文件定义的整数变量，其值描述了调用库函数时产生的**错误条件或诊断信息**（提示信息）
-
-**库函数都可以对其改写**，用于标识错误类型
 
 
 
@@ -3283,7 +3279,22 @@ public:
 
 
 
-### 026 STL对pair<int, int>的支持
+### 026 errno变量
+
+**errno是一个全局整数变量**
+
+- 其值描述了调用库函数时产生的**错误条件或诊断信息**（提示信息）
+- **库函数都可以对其改写**，用于标识错误类型，以read()为例
+  - 非阻塞read()发现缓存区中无数据时，返回-1，并将errno**置为EAGAIN**常量
+
+- 使用时需包含errno.h头文件，因为此头文件中有error的extern声明
+- perror()函数用于输出errno对应的错误描述
+
+![image-20220729012903399](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220729012903399.png)
+
+
+
+### 027 STL对pair<int, int>的支持
 
 - vector支持 **vector<pair<int, int>>**
 - 堆结构支持 **priority_queue<pair<int, int>>**，默认大根堆
