@@ -2538,9 +2538,182 @@ string name = s.substr(4);		// name = "Zhu Wan Dong"
 
 
 
+## g++ & makefile & CMakeList
+
+#### 1 VSCode详解
+
+**VScode本质上只是一个文本编辑器**
+
+- 其includePath默认包含
+  - **`/usr/include/`** -- C/C++头文件位置
+  - **`${workspaceFolder}/**`** -- 源文件当前所在位置
+- 其余位置需要在**`.vscode/c_cpp_properties.json`**中配置
+- 以上配置只是保证**在编写code的时候，能正确找到头文件**
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220216020526808.png" alt="image-20220216020526808" style="zoom: 80%;" />
+
+
+
+
+
+#### 2 g++详解
+
+**g++本质是一个应用程序**，用户安装后
+
+- 在**`/usr/bin/`**目录下出现了**`g++`**，这意味着可以在bash中用**`g++ main.cc -o app`**编译c文件
+- 在**`/usr/include/`**目录下出现了stdio.h等C头文件，**这是g++暴露给用户开发的接口**
+
+```bash
+sudo apt update			# 获取最新软件更新 
+sudo apt install g++	# 安装g++
+						# 如果出现连接失败的错误，则需要修改nameserver
+```
+
+
+
+**开发应用的一般步骤**（以mysql为例）
+
+- **安装mysql应用程序 mysql-server**
+
+  - 完成此步后，在**`/usr/bin/`**目录下出现了**`mysql`**，这意味着可以在bash中用**`mysql -uroot -p`**进入mysql服务
+
+
+  ```bash
+  sudo apt update					# 获取最新软件更新 
+  sudo apt install mysql-server	# 安装mysql-server
+  ```
+
+  ![image-20220216023052818](E:/ShareFile/C++后端技术栈/g++&makefile&CMakeList.assets/image-20220216023052818.png)
+
+- 但安装好mysql-server后，并不能直接开发mysql，**因为没有/usr/include配套的头文件作为接口**
+
+- **安装mysql开发包**
+
+  - 开发包安装完成后，**`/usr/include/mysql`**被创建，**里面包含了开发mysql需要的接口**
+
+  ```bash
+  sudo apt install libmysqlclient-dev		# 程序编译时链接的库
+  ```
+
+  ![image-20220216024133374](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220216024133374.png)
+
+
+
+
+#### 3 makefile & CMakeList
+
+**g++指令用于编译源文件**
+
+- 可直接在终端中执行
+- 指令较多时，重复输入不方便
+- 需要安装g++编译器
+
+
+
+**Makefile文件是一系列g++指令的集合**
+
+- 用make指令在终端调用，一次性执行多条g++指令
+- 规则复杂
+- 通常置于 projRootDir/bulid 文件夹内
+
+
+
+**CMakeList.txt**
+
+- 规则简单
+- 用cmake dir 在终端调用，生成Makefile
+- 所在目录为**顶层目录**（**变量PROJECT_SOURCE_DIR、CMAKE_SOURCE_DIR的值**）
+
+
+
+**实际开发流程**
+
+1. 在项目顶层目录（projRootDir）下编写好CMakeList.txt
+2. 创建并cd至bulid目录下
+3. 终端调用`cmake ..`
+4. 终端调用`make`
+
+
+
+#### 4 链接过程详解
+
+**静态库的生成**
+
+```c
+//1.先写出相应的.h文件和对应的.c文件
+//2.编译.c文件
+//3.使用ar工具将.o文件归档生成.a静态库文件
+[root@localhost linux]# ls
+add.c add.h main.c sub.c sub.h
+[root@localhost linux]# gcc -c add.c -o add.o
+[root@localhost linux]# gcc -c sub.c -o sub.o
+//生成静态库
+//命名一般开头为lib
+[root@localhost linux]# ar -rc libmymath.a add.o sub.o
+//ar是gnu归档工具，rc表示(replace and create)
+//测试目标文件生成后，静态库删掉，程序照样可以运行。
+```
+
+
+
+**动态库的生成**
+
+```c
+//fPIC:产生位置无关码(position independent code)
+[root@localhost linux]# gcc - fPIC -c sub.c add.c
+//shared:表示生成共享库格式
+//生成静态库
+//命名一般开头为lib
+[root@localhost linux]# gcc -shared -o libmymath.so *.o
+[root@localhost linux]# ls
+add.c add.h add.o libmymath.so main.c sub.c sub.h sub.o
+//原文链接：https://blog.csdn.net/weixin_42458272/article/details/106193786
+```
+
+
+
+**库文件的搜索**
+
+- 库名在编译时用 **-l** 指定
+
+- 库路径
+
+  - **第一优先级**：从**-L** 指定库路径中找库名（从左往右，依次查找编译命令中指定的路径）
+
+  - **第二优先级**：由**环境变量**指定的目录（**LIBRAY_PATH**）
+
+  - **第三优先级**：由**系统指定的目录**
+    - /usr/lib	
+    - /usr/local/lib
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220223225848330.png" alt="image-20220223225848330" style="zoom: 80%;" />
+
+
+
+**g++编译与CMake对应**
+
+|      功能      |         g++指令         |                   CMake指令                   |
+| :------------: | :---------------------: | :-------------------------------------------: |
+| 添加头文件目录 |     -I（大写的 i ）     |              include_directories              |
+| 添加库文件目录 |           -L            |               link_directories                |
+|    链接库名    |     -l （小写的 L）     |             target_link_libraries             |
+|  增加编译参数  | -Wall -std=c++11 -O2 -g | add_compile_options(-Wall -std=c++11 -O2 -g ) |
+|   生成静态库   |     -c<br />ar -rs      |        add_library(name SHARED ${SRC})        |
+|   生成动态库   |   -c<br />g++ -shared   |        add_library(name STATIC ${SRC})        |
+| 生成可执行文件 |           g++           |          add_executable(main ${SRC})          |
+
+
+
+**CMake变量取值 -- ${变量名}**
+
+- 变量名可以是set自定义的：`set(SRC sayhello.cpp hello.cpp)`即`SRC = sayhello.cpp hello.cpp`
+- 也可以是CMake常用变量：`PROJECT_SOURCE_DIR`
+
+
+
 ## C++知识点收集
 
-### 001 C++函数缺省值🌼
+#### 001 C++函数缺省值🌼
 
 **函数声明时可以有**缺省(默认)值
 
@@ -2555,7 +2728,7 @@ void Rand(int minvalue, int maxvalue, int totalcount, bool brep) {		// 定义时
 
 
 
-### 002 生存期 作用域 可见性🌼
+#### 002 生存期 作用域 可见性🌼
 
 **生存期 -- 变量在内存中存在的时间区间**
 
@@ -2578,13 +2751,13 @@ void Rand(int minvalue, int maxvalue, int totalcount, bool brep) {		// 定义时
 
 
 
-### 003 static关键字🌼
+#### 003 static关键字🌼
 
 static是C/C++中的关键字，**用于改变变量的存储方式和可见性**
 
 
 
-#### 3.1 static修饰局部变量
+##### 3.1 static修饰局部变量
 
 - static 告知编译器，**将局部变量存储静态区而非栈上空间**
 - static**延长了局部变量的生命周期**，直到主程序运行结束才释放
@@ -2611,7 +2784,7 @@ int main(int argc, char *argv[]) {
 
 
 
-#### 3.2 static 修饰全局变量
+##### 3.2 static 修饰全局变量
 
 - 静态全局变量**具有文件作用域**，不能在其它文件中访问，即使extern外部声明也不可以
 
@@ -2619,7 +2792,7 @@ int main(int argc, char *argv[]) {
 
 
 
-#### 3.3 在类中使用static
+##### 3.3 在类中使用static
 
 **类静态变量**
 
@@ -2668,7 +2841,7 @@ int main(int argc, char *argv[]){
 
 
 
-### 004 C++格式控制符🌼
+#### 004 C++格式控制符🌼
 
 | 控制符 |             含义             |
 | :----: | :--------------------------: |
@@ -2680,7 +2853,7 @@ int main(int argc, char *argv[]){
 
 
 
-### 005 typedef & struct关键字🌼
+#### 005 typedef & struct关键字🌼
 
 **struct**关键字用于定义结构体
 
@@ -2719,7 +2892,7 @@ typedef struct BiTNode{
 
 
 
-### 006 数值常量INT_MIN DBL_MIN DBL_EPSILON🌼
+#### 006 数值常量INT_MIN DBL_MIN DBL_EPSILON🌼
 
 **INT_MIN INT_MAX**
 
@@ -2762,7 +2935,7 @@ f1 == f2;					// 错误做法,会引发逻辑错误
 
 
 
-### 007 指针的内存大小🌼
+#### 007 指针的内存大小🌼
 
 指针大小**由操作系统决定**，**与指向的数据类型无关**
 
@@ -2772,7 +2945,7 @@ f1 == f2;					// 错误做法,会引发逻辑错误
 
 
 
-### 008 函数指针🌼
+#### 008 函数指针🌼
 
 函数指针是**用于存放函数地址的指针**
 
@@ -2803,7 +2976,7 @@ int main(void) {
 
 
 
-### 009 struct VS class🌼
+#### 009 struct VS class🌼
 
 在C语言中，struct 只能包含成员变量，不能包含成员函数（**C不是面向对象的1个体现**）
 
@@ -2815,7 +2988,7 @@ int main(void) {
 
 
 
-### 010 内存高低地址 & 变量的高低位 & 大小端法🌼
+#### 010 内存高低地址 & 变量的高低位 & 大小端法🌼
 
 - **高地址**：地址编号值大；`0x10c9a88`
 - **低地址**：地址编号值小；`0x10c9a78`
@@ -2828,7 +3001,7 @@ int main(void) {
 
 
 
-### 011 指针常量和常量指针🌼
+#### 011 指针常量和常量指针🌼
 
 **指针常量** -- 指针本身是常量，不可以改变指针指向的对象
 
@@ -2848,7 +3021,7 @@ p = &b;				// 可以
 
 
 
-### 012 类成员变量的声明与定义🌼
+#### 012 类成员变量的声明与定义🌼
 
 **类内只是申明变量**
 
@@ -2856,7 +3029,7 @@ p = &b;				// 可以
 
 
 
-### 013 C++自定义比较器🌼
+#### 013 C++自定义比较器🌼
 
 **C++比较器详解**
 
@@ -2917,7 +3090,7 @@ set<Str, Strcmp>;							// 创建Str的set对象，注意这里给的是类本�
 
 
 
-### 014 前向声明🌼
+#### 014 前向声明🌼
 
 **前向声明**(forward declare) -- **在定义类之前先声明**
 
@@ -2947,7 +3120,7 @@ public:
 
 
 
-### 015 线程锁竞争🌼
+#### 015 线程锁竞争🌼
 
 **锁机制用于在多线程程序中保护临界区资源**
 
@@ -2959,7 +3132,7 @@ public:
 
 
 
-### 016 vector手动分配内存🌼
+#### 016 vector手动分配内存🌼
 
 **初始化时分配**
 
@@ -2977,7 +3150,7 @@ foo.resize(10, 6);	// 重设大小，扩大部分填充为指定值
 
 
 
-### 017 STL operator[] & operator<
+#### 017 STL operator[] & operator<
 
 **operator[] 成员访问**
 
@@ -2997,7 +3170,7 @@ foo.resize(10, 6);	// 重设大小，扩大部分填充为指定值
 
 
 
-### 018 STL容器内存占用🌼
+#### 018 STL容器内存占用🌼
 
 **STL容器本身占用一定的内存**
 
@@ -3033,7 +3206,7 @@ foo.resize(10, 6);	// 重设大小，扩大部分填充为指定值
 
 
 
-### 019 同步和异步🌼
+#### 019 同步和异步🌼
 
 **线程中的同步与异步**
 
@@ -3052,7 +3225,7 @@ foo.resize(10, 6);	// 重设大小，扩大部分填充为指定值
 
 
 
-### 020 运算符优先级🌼
+#### 020 运算符优先级🌼
 
 |                          |   优先级别   |                   实例                    |
 | :----------------------: | :----------: | :---------------------------------------: |
@@ -3087,7 +3260,7 @@ if (listen_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) < 0)
 
 
 
-### 021 extern关键字🌼
+#### 021 extern关键字🌼
 
 **extern关键字用外部变量**
 
@@ -3106,7 +3279,7 @@ int main(void){
 
 
 
-### 022 STL哈希表支持的数据类型🌼
+#### 022 STL哈希表支持的数据类型🌼
 
 哈希表**直接支持的类型**
 
@@ -3144,7 +3317,7 @@ int main(void){
 
 
 
-### 023 C++在A.cpp中调用B.cpp定义的函数🌼
+#### 023 C++在A.cpp中调用B.cpp定义的函数🌼
 
 **创建头文件并包含**
 
@@ -3161,7 +3334,7 @@ int main(void){
 
 
 
-### 024 派生类的访问权限
+#### 024 派生类的访问权限
 
 **派生类访问权限**
 
@@ -3189,7 +3362,7 @@ public:
 
 
 
-### 025 C++异常处理 throw try catch
+#### 025 C++异常处理 throw try catch
 
 C++程序运行时可能出现异常情况，如内存溢出、文件打开失败，如果不及时处理异常，可能会导致程序崩溃，所以**引入C++异常处理机制**
 
@@ -3279,7 +3452,7 @@ public:
 
 
 
-### 026 errno变量
+#### 026 errno变量
 
 **errno是一个全局整数变量**
 
@@ -3294,7 +3467,7 @@ public:
 
 
 
-### 027 STL对pair<int, int>的支持
+#### 027 STL对pair<int, int>的支持
 
 - vector支持 **vector<pair<int, int>>**
 - 堆结构支持 **priority_queue<pair<int, int>>**，默认大根堆
