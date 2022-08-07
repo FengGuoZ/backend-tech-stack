@@ -2583,7 +2583,7 @@ sudo apt install g++	# 安装g++
   sudo apt install mysql-server	# 安装mysql-server
   ```
 
-  ![image-20220216023052818](E:/ShareFile/C++后端技术栈/g++&makefile&CMakeList.assets/image-20220216023052818.png)
+  ![image-20220216023052818](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220216023052818.png)
 
 - 但安装好mysql-server后，并不能直接开发mysql，**因为没有/usr/include配套的头文件作为接口**
 

@@ -367,7 +367,9 @@ Info foo(...){
 
 ### ACM IO指北
 
-#### std::cin
+#### IO函数
+
+##### std::cin
 
 cin >> 变量，可自动跳过\n
 
@@ -378,7 +380,7 @@ cin >> string，读取一条字符串
 
 
 
-#### getchar()
+##### getchar()
 
 读取一个字符
 
@@ -386,9 +388,7 @@ cin >> string，读取一条字符串
 
 
 
-
-
-#### getline()
+##### getline()
 
 读取一行
 
@@ -399,7 +399,7 @@ getline(cin, s);		// 读取完整一行，不会因为空格而暂停
 
 
 
-#### 判断EOF
+##### 判断EOF
 
 getline()
 
@@ -413,6 +413,33 @@ while(getline(cin, s)) {	// 读取到EOF时自动跳出
 
 while(cin >> s) {			// 读取到EOF时自动跳出
     // ...
+}
+```
+
+
+
+#### 常用IO模式
+
+##### 已知数据组数 -- for读取
+
+```c++
+int n = 0;
+cin >> n;	// 得到数组组数
+vector<int> arr(n);
+for(int ii=0; ii<n; ii++) {
+    cin >> arr[ii];
+}
+```
+
+
+
+##### 数组组数位置 -- while读取3
+
+```c++
+vector<int> arr;
+int val = 0;
+while(cin >> val) {		// 读取完成后会自动跳出
+    arr.push_back(val);
 }
 ```
 
