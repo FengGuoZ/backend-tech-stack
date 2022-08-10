@@ -1,8 +1,709 @@
+### 时间复杂度
+
+>左神基础班 -- 20210919~20211120
+
+**时间复杂度O**：度量**算法执行时间与数据规模关系**的指标
+
+- 不考虑必须要的操作（赋初值、初始化等）
+
+- **只考虑最高阶项**（`O( )`描述的是上限问题）
+  - 不考虑低阶项
+  - 不考虑最高阶项系数
+
+- 默认规定
+
+  - **数据规模足够大**
+
+  - **同阶复杂度**通过**实验测时**定优劣
+
+  - **学算法时**，只考虑**最坏**时间复杂度
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20211108211245058.png" alt="image-20211108211245058" style="zoom:50%;" />
+
+
+
+### 01 排序算法🌼🌼 
+
+![image-20220612164517232](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220612164517232.png)
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20210922100642697.png" alt="image-20210922100642697" style="zoom: 50%;" />
+
+- 十大排序算法：**选泡插 快归堆希 统计基**
+- 排序算法**稳定性**：**相等数据的相对顺序在排序过程中不会变换**
+- **基于比较的排序**，时间复杂度最小为**nlogn**
+- 桶计基为不基于比较的排序
+- 时间复杂度为**nlogn**时，**没有**能同时做到空间复杂度**O(n)以下**和**保持稳定**
+
+
+
+#### n^2^排序
+
+##### 1. 选择排序（不稳）🌼🌼
+
+- **最小值移动到头部**
+
+- 算法思路
+  - 遍历 **[ii ~ n)** ，记录**最小下标** minPos 
+  - `swap(Arr[ii], Arr[minPos])`
+    - 每次遍历**只swap一次**
+  - **循环 n 次**
+- 算法优化：记录**最小与最大下标**，分别移至（相对）开头和（相对）结尾。
+  - 使得**循环次数减半**
+
+
+
+##### 2. 冒泡排序（稳）🌼🌼
+
+- **最大值冒泡到尾部**
+
+- 算法思路
+
+  - 遍历 **[0 ~ ii]** 
+
+  - 过程中 **swap 逆序对**
+
+    ```c++
+    if(arr[jj] > arr[jj+1])
+        swap(arr[jj], arr[jj+1]);
+    ```
+
+  - **循环 n 次**
+
+- 算法优化：如果某次 **[0 ~ ii]**遍历中，发生**0次**交换，**直接跳出循环**
+
+  - 用flag标志位实现
+  - 使得**最佳时间复杂度为O(n)**
+
+
+
+##### 3. 插入排序（稳）🌼🌼
+
+- **做到[0, ii）范围上有序**
+- 算法思路
+  - 遍历**(ii ~ 0]**
+  - 过程中**将 ii 上的插入到合适位置**（通过顺序swap实现）
+  - **循环 n 次**
+
+- 算法优化：用**标记位（哨兵）**代替swap方法
+
+- 补充说明：插入排序为 **O(n^2)** 排序中**最重要的一种**
+  - 选择排序不稳
+  - 冒泡排序太慢
+
+
+
+##### 4. 希尔排序（不稳）
+
+- **以不同步长序列进行插入排序**
+- **平均时间复杂度**为**n^1.3**
+- Knuth序列：
+
+![image-20210925002403517](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20210925002403517.png)
+
+
+
+#### nlogn排序
+
+##### 5. 归并排序（Merge Sort 稳）🌼🌼
+
+```c++
+void mergeSort(vector<int>& nums, int left, int right);
+```
+
+-  **算法思想** -- 递归
+   -  原数组等分
+   -  **使左子数组有序**
+   -  **使右子数组有序**
+   -  **辅助空间merge**左右有序子数组，使整体有序
+      -  注意**要有结果导出**
+
+-  **复杂度**
+   -  时间：**O(nlogn)**
+   -  空间：**O(n)** ，**需要辅助空间**
+
+-  **适用场景**：**要求稳定性**的排序，一般是类对象 
+   - java、python语言对象排序内置方法为（改进的）归并排序
+
+
+
+##### 6. 快速排序（Quick Sort 不稳）🌼🌼
+
+```c++
+void quickSort(vector<int>& nums, int left, int right);
+```
+
+- **算法思想** -- 递归
+  - 从当前区间中**随机一个值做pivot**（中轴），并将此值**swap至区间尾巴**
+  - **做partition**
+    - 本质是 **`小于区` 向右推 `等于区` 直到撞上 `大于区`** 
+    - **荷兰国旗问题** 
+  - **递归**以上过程
+
+
+
+- **注意事项** -- **pivot必须是随机值**，否则时间复杂度为O(n^2)
+
+
+
+==归并排序是先递归后处理本层==
+
+==快排是先处理本层后递归==
+
+
+
+##### 7. 堆排（Heap Sort 不稳）🌼🌼
+
+**堆结构** -- **逻辑上的完全二叉树**
+
+- **节点对应关系**
+
+  - **左孩子**：i.lchild = i*2 + 1
+  - **右孩子**：i.rchild = i*2 + 2
+  - **父节点**：i.father = (i - 1)/2 （**i=0节点的父节点为i=0，也满足此公式**）                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+
+- **堆的分类**
+
+  - **大根堆**：头节点为子树**最大值**
+  - **小根堆**：头节点为子树**最小值**
+
+- **堆操作**
+
+  - **heap insert**：向堆中**插入数据**
+
+    - **heapsize++**
+
+    - **向上交换**
+
+      ```mysql
+      int father = (cur-1) / 1;
+      while(arr[cur] > arr[father]){
+      	swap(arr[cur], arr[cur.father]);
+      }
+      ```
+
+  - **heapify**：**修改堆顶后**，**恢复**为大根堆
+
+    ```c
+    while(cur < heapsize){
+    	int lchild = (2*cur) + 1;
+    	int rchild = (2*cur) + 2;
+        int maxIdx = cur;
+        
+    	if(lchild < heapsize)
+    		maxIdx = (arr[cur] >= arr[lchild]) ? cur:lchild;
+        if(rchild < heapsize)
+            maxIdx = (arr[maxIdx] >= arr[rchild]) ? maxIdx:rchild;
+        
+        if(maxIdx == cur){		// 已到底，或cur为当前子树的最大值
+            break;
+        } else{					// 调整位置后继续
+            swap(arr[cur], arr[maxIdx]);
+            cur = maxIdx;
+        }
+    }
+    ```
+
+  - **heap pop**：**删除**堆顶，并恢复堆结构
+
+    - **`swap(arr[0], arr[--heapsize])`**
+      - 堆结构**能直接删除的只有堆尾**
+    - heapify
+
+- **堆结构比堆排序更重要**
+
+
+
+- 堆结构在C++标准库中的实现**(优先级队列)**：
+  - 定义大根堆 **`priority_queue<int> bigHeap;`**
+  - 定义小根堆**`priority_queue<int, vector<int>, greater<int>> smallHeap;`**
+  - **push()**：执行heapInsert操作
+  - **pop()**: 删除堆顶值，然后heapify
+    - 没有单独的heapify
+  - **top()**：获取堆顶值
+
+
+
+##### nlogn排序比较🌼🌼
+
+**归并、快排、堆排比较**
+
+- **快排**的**时间**复杂度**常数项最小** **（快）**
+- **堆排**的**空间**复杂度最低**（小）**
+- **归并排序**能保持**稳定性** **（稳）**
+
+
+
+#### 不基于比较排序
+
+##### 8. 计数排序（稳）🌼🌼
+
+- 算法思想
+  - 找出数组中的最大值、最小值
+  - 创建计数数组count[max-min+1]
+  - 统计数组范围中各个数出现的次数
+  - 根据count[max-min+1]还原出排序后的数组
+- 算法时间复杂度O(n+k)，空间复杂度O(k)
+  - **k为数组数据取值范围**
+- **适用于k较小的数组**
+  - 例如：人的年龄0-200足矣
+
+
+
+##### 9. 基数排序（稳）
+
+- **算法思想**
+  - **找出数组最大值，**计算位数k
+  - 创建基数**队列** **`queue<int> qArr[10];`**（十进制数每位上的数字必为0~9中的一个）
+  - 按照个、十、百、千......k位上的数字，将数组中的值在qArr中归类
+  - 将qArr中归类后的数据，赋值给数组，排序完毕
+- 队列的**FIFO特性保证了算法的稳定性**
+- 时间复杂度O(n*k)，空间复杂度O(n+k)
+
+
+
+##### 10. 桶排序（稳）
+
+- **计数排序的拓展版本**
+- 计数排序的每个桶只存储相同元素，而桶排序每个桶存储一定范围的元素
+  - **桶内部也需要排序**
+
+
+
+#### 排序延伸问题
+
+##### 1. 逆序对问题（Merge Sort延伸）51🌼🌼
+
+![image-20220809150447431](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809150447431.png)
+
+- **解题思路**：**归并排序过程中统计**
+
+  ```c++
+  int cnt=0, tc=0;
+  while(ii<=mid && jj<=right){
+      if(nums[ii] <= nums[jj]){       // 必须ii优先占位
+          hv[index++] = nums[ii++];
+          cnt += tc;                  // 计数位置★
+      }else{
+          hv[index++] = nums[jj++];
+          tc++;                       // 右子数组的逆序基数++
+      }
+  }
+  ```
+
+- **注意事项**：递归+归并过程**能保证不重不漏**
+
+
+
+##### 2. 小和问题（Merge Sort延伸）🌼🌼
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220213190746434.png" alt="image-20220213190746434" style="zoom:50%;" />
+
+
+
+- 解题思路:**归并排序过程中统计**，思路同上，注意实现细节
+
+  ```c++
+  int cnt=0, tc=right-mid;
+  while(ii<=mid && jj<=right){
+      if(nums[ii] < nums[jj]){        // 必须jj优先占位
+          hv[index++] = nums[ii++];
+          cnt += tc*nums[ii];         // 小和计算位置★
+      }else{
+          hv[index++] = nums[jj++];
+          tc--;                       // 右子数组的小和基数--
+      }
+  }
+  ```
+
+  
+
+##### 3. 荷兰国旗问题（Quick Sort延伸）75🌼🌼
+
+- **题目描述**
+  - 给定一个数组arr，和一个数pivot。
+    - 请把小于pivot的数放在数组的左边，
+    - 等于pivot的数放在数组的中间，
+    - 大于pivot的数放在数组的右边。
+  - 要求额外空间复杂度0(1)，时间复杂度0(N)
+
+
+
+- **解题思路**
+
+  - 维护三个指针 lb cur rb
+
+    - lb：小于区的右边界，初始化为-1
+    - cur：当前位置，初始化为0
+    - rb：大于区的左边界,，初始化为nums.size()
+
+  - 本质是 **`小于区` 向右推 `等于区` 直到撞上 `大于区`** 
+
+    ```c++
+    // 当前区间[left, right]
+    int lb=left-1, rb=right+1, ii=left;         // 初始化为非法位置
+    while(ii < rb){
+        if(nums[ii] < pivot){
+            swap(nums[ii++], nums[++lb]);
+        } else if(nums[ii] == pivot){
+            ii++;
+        } else{	// nums[cur]>pivot
+            swap(nums[ii], nums[--rb]);
+        }
+    }
+    // 本次排序完成后 [left, lb]	[lb+1, rb-1]	[rb, right]
+    //			     <pivot		   ==pivot		  >pivot
+    ```
+
+
+
+### 02 链表专题🌼🌼
+
+#### 1.  反转单向、双向链表 206🌼🌼
+
+![image-20220809153853726](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809153853726.png)
+
+**算法思路**
+
+- 单向链表：**用双辅助节点prev、cur**
+- 双向链表：单辅助节点cur，swap(next, prev)即可
+
+
+
+#### 2. 有序链表的公共部分🌼
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20210927223658157.png" alt="image-20210927223658157" style="zoom:50%;" />
+
+**算法思路**
+
+- 两个指针指向头
+- 谁小谁后移
+- 相同则打印，并同时后移
+- 其中一个指针为nullptr时停止
+
+```c++
+ListNode *p1=head1, *p2 head2;
+while(p1 && p2) {
+    if(p1->value == p2->value){
+        res.push(p1->value);
+        p1 = p1->next;
+        p2 = p2->next;
+    } else if(p1->value < p2->value){
+        p1 = p1->next;
+    } else{
+        p2 = p2->next;
+    }
+}
+```
+
+
+
+#### 3. 分隔链表 86🌼🌼
+
+![image-20220809154854274](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809154854274.png)
+
+**算法思路**
+
+- version1：将链表中的元素放入数组中，**做parition**
+  - **没有稳定性**
+- version2：用sH、sT、eH、eT、bH、bT**六个指针** **划分出小于pivot、等于pivot、大于pivot三个链表**，而后拼接
+  - **稳定**
+  - 拼接步骤考验coding能力
+
+
+
+#### 4. 求链表入环节点  22🌼🌼
+
+![image-20220809155245418](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809155245418.png)
+
+
+
+**算法思路**
+
+- version1：哈希表存储遍历过的节点，第一个重复出现的node为入环node
+- version2：**快慢指针** + 快慢指针第一次重合后将快指针归head，第二次重合即为**入环节点**（**魔性的数学**）
+  - **归位后，快指针和慢指针每次都只移动一步**
+
+
+
+#### 5. 两个单链表相交（链表难度天花板）52🌼🌼
+
+![image-20220809155537897](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809155537897.png)
+
+**算法思路**
+
+- 先判断L1、L2有无环
+
+- 分情况讨论
+
+  |  L1  |  L2  |          判断相交          |
+  | :--: | :--: | :------------------------: |
+  | 无环 | 无环 | 交换跑道（对的人总会相遇） |
+  | 无环 | 有环 |       **不可能相交**       |
+  | 有环 | 有环 |        哈希缓存去做        |
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809161930906.png" alt="image-20220809161930906" style="zoom:50%;" />
+
+```c++
+// 无环链表相交
+ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+    if(headA==NULL || headB==NULL)
+        return NULL;
+
+    ListNode* p1=headA, *p2=headB;
+    while(p1 != p2){                    // 无论是否相交都一定会有p1=p2，不会造成死循环
+        p1 = p1 ? p1->next : headB;     // 后移1位or交换跑道
+        p2 = p2 ? p2->next : headA;     
+    }
+
+    return p1;
+}
+```
+
+
+
+#### 6. 删除链表倒数第k个节点 21🌼
+
+![image-20220809163833670](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809163833670.png)
+
+**算法思路：快慢指针**
+
+- fast指针先走**k+1**步
+
+- 特殊情况下，链表共k个节点 - 删除头节点
+
+
+
+#### 7. 删除链表节点O(1)  237🌼
+
+![image-20220809164044878](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809164044878.png)
+
+
+
+算法思路：trick（**李代桃僵**）
+
+- 赋值下一节点（本节点原内容被覆盖/删除）
+- 删除下一节点
+
+
+
+### 03 二叉树专题🌼🌼
+
+#### 1.  二叉树的遍历 144 94 145🌼🌼
+
+**实现二叉树的前中后顺遍历**
+
+- 先序遍历：根节点 **->** 左子树 **->** 右子树
+- 中序遍历：左子树 **->** 根节点 **->** 右子树
+- 后序遍历：左子树 **->** 右子树 **->** 根节点
+- **深度优先遍历(DFS)**：即二叉树的先序遍历
+- **宽度优先遍历(BFS)**：按层遍历（也叫广度优先遍历、层序遍历）
+
+
+
+**递归解法**
+
+- **递归序**：递归过程中，**二叉树的每个节点经过三次**
+  - **第一次经过**时记录：**先序**
+  - **第二次经过**时记录：**中序**
+  - **第三次经过**时记录：**后序**
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20211003164413091.png" alt="image-20211003164413091" style="zoom:50%;" />
+
+
+
+**迭代解法（栈结构）**
+
+- **先序遍历**
+
+  - 压入根节点
+
+  - 栈顶出栈并打印，**先后压入栈顶的右、左孩子**
+
+  - 重复上一步，直至栈为空
+
+- **后序遍历**
+
+```c++
+// Talk is cheap, show me the code
+
+class Info{	// 辅助信息结构体
+public:
+    TreeNode* node;
+    int flag;   // 出栈权限 1表示当前不可以出栈 2表示当前可以出栈
+    Info(TreeNode* n, int f)
+        :   node(n), flag(f) {}
+};
+
+vector<int> postorderTraversal(TreeNode* root) {
+    if(root == NULL)
+        return {};
+    
+    vector<int> res;
+    stack<Info> hSta;
+    hSta.push(Info(root, 1));   // root节点第一次入栈 初始权限为不可出栈
+
+    while(!hSta.empty()) {
+        if(hSta.top().flag == 2) {  // 当前节点可以出栈
+            res.push_back(hSta.top().node->val);
+            hSta.pop();
+            continue;
+        }
+
+        hSta.top().flag = 2;    // 修改top()节点出栈权限
+
+        // 先右后左入栈
+        TreeNode* pNode = hSta.top().node;
+        if(pNode->right) {
+            hSta.push(Info(pNode->right, 1));
+        }
+        if(pNode->left) {
+            hSta.push(Info(pNode->left, 1));
+        }
+    }
+
+    return res;
+}
+```
+
+- **中序遍历**（提供了一种**按 / 分解二叉树的思路** ）
+
+  - **压入根节点及所有左子节点**
+
+  - 栈顶出栈并打印，**压入栈顶的右孩子及其所有左子节点**
+
+  - 重复上一步直至栈空
+
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20211003200903335.png" alt="image-20211003200903335" style="zoom:50%;" />
+
+#### 2. 二叉树每层的最大值 44
+
+![image-20220809170554650](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809170554650.png)
+
+**算法思路**
+
+- 用queue进行层序遍历
+- **同时维护层边界**
+
+```c++
+queue<TreeNode*> que;
+que.push(root);
+
+while(!que.empty()) {
+    int levelNum = que.size();  // 用levelNum维护层边界
+    int levelMax = INT_MIN;
+    
+    while(levelNum--) {
+        TreeNode* pNode = que.front();
+        que.pop();
+        if(pNode->left) que.push(pNode->left);
+        if(pNode->right) que.push(pNode->right);
+    }
+}
+```
+
+
+
+#### 3.  判断BST（二叉排序树）98🌼🌼
+
+**中序序列递增**
+
+
+
+#### 4. 判断平衡二叉树 BBT 55🌼🌼
+
+**二叉树递归套路**
+
+左子树为平衡二叉树 && 右子树为平衡二叉树 && 左右子树高度差<=1
+
+```c++
+typedef pair<int, bool> Info;	// first表示树高度，second表示是否平衡
+Info process(TreeNode* root); 	// 递归接口
+```
+
+
+
+#### 5. 二叉树的最低公共祖先 236🌼🌼
+
+**二叉树递归套路**
+
+**有且只有**最低公共祖先满足以下条件中的一个
+
+- 左子树包含一个node、右子树包含另一个node
+- 自身为一个node，左、右子树中包含另一个node
+
+```c++
+int process(TreeNode* root);	// 递归接口，int表示root上目标节点个数
+```
+
+
+
+#### 6. 二叉树的直径
+
+![image-20220809203700645](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809203700645.png)
+
+**二叉树递归套路**
+
+当前树的最大直径**有3个候选**
+
+- 左子树最大直径
+- 右子树最大直径
+- 左子树深度+右子树深度+1
+
+```c++
+class Info {
+public:
+    int depth;
+    int diameter;
+    Info(int d, int dia)
+        : depth(d), diameter(dia) {};
+};
+```
 
 
 
 
 
+#### . 二叉树的序列化和反序列化 37🌼🌼
+
+![image-20220809202652011](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809202652011.png)
+
+**序列化**：从一棵二叉树转化为字符串
+
+**反序列化**：将字符串还原为二叉树
+
+要求：二叉树与字符串是严格的11映射关系
+
+
+
+**算法思路**
+
+- 序列化和反序列化遵循**同一规则**
+- 用先序序列化，在反序列化时的规则：**建根节点 -> 建左子树 -> 建右子树**
+  - 用**`_`**分隔节点（字符串中存储的是节点值）
+  - 用**`#`**标志NULL节点
+
+
+
+**注意事项**
+
+- 定制stoi，省去内存拷贝
+
+```c++
+// 定制stoi, 省去内存拷贝
+int stoi(string& s, int& index){
+    int flag = 1;
+    if(s[index] == '-') {           // 符号位
+        flag = -1;
+        index++;
+    }
+    int res = 0;
+    while(index<s.size() && s[index]>='0' && s[index]<='9'){
+        res = res*10 + (s[index++] - '0');
+    }
+    return flag * res;
+}
+```
 
 
 
@@ -365,7 +1066,7 @@ Info foo(...){
 
 
 
-### ACM IO指北
+### ACM指北
 
 #### IO函数
 
@@ -433,7 +1134,7 @@ for(int ii=0; ii<n; ii++) {
 
 
 
-##### 数组组数位置 -- while读取3
+##### 数组组数位置 -- while读取
 
 ```c++
 vector<int> arr;
@@ -443,3 +1144,55 @@ while(cin >> val) {		// 读取完成后会自动跳出
 }
 ```
 
+
+
+##### 按行读取
+
+```c++
+#include<sstream>	// istringstream头文件
+
+string s;
+while(getline(cin, s)) {	// 读取一行
+    istringstream line(s);	// string转化为流
+    while(line >> val) {
+        // ...
+    }
+}
+```
+
+
+
+
+
+#### 自定义数据结构
+
+```c++
+// 链表
+struct ListNode {
+    int val;
+    ListNode *next;
+};
+
+// 二叉树
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+};
+```
+
+
+
+#### Tips
+
+##### 95%通过
+
+很有可能是数据范围的问题
+
+int->long或能解决
+
+
+
+##### trick
+
+时间不足时，bool类型直接返回true，可能通过50%的测试用例
