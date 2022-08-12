@@ -102,3 +102,11 @@ git config --global https.proxy https://127.0.0.1:33210	# 设置git的https代�
 #### git config --list 查看当前配置
 
 ![image-20220719000229155](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220719000229155.png)
+
+
+
+#### git commit --amend 修改最后一次提交的注释
+
+![image-20220811003323182](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220811003323182.png)
+
+![image-20220811003345660](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220811003345660.png)

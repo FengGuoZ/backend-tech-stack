@@ -662,9 +662,15 @@ public:
 
 
 
+#### 7. 对称二叉树（递归接口转化）28🌼🌼
+
+![image-20220811225659972](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220811225659972.png)
+
+思维上**适应递归在逻辑上的压栈行为**
 
 
-#### . 二叉树的序列化和反序列化 37🌼🌼
+
+#### 8. 二叉树的序列化和反序列化 37🌼🌼
 
 ![image-20220809202652011](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809202652011.png)
 
@@ -707,6 +713,972 @@ int stoi(string& s, int& index){
 
 
 
+#### 9. 重建二叉树 07
+
+![image-20220811225839485](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220811225839485.png)
+
+**算法思路**
+
+- 利用前序首元素+中序序列划分左右子树
+- 递归处理
+- 递归过程中，**前序序列和中序序列一直对应同一棵子树**
+
+```c++
+// 递归做法，用坐标边界作为递归参数
+// 前序序列范围：[pL, pR] 中序序列范围[iL, iR]
+TreeNode* process(vector<int>& preorder, vector<int>& inorder, int pL, int pR, int iL, int iR) {   
+    
+}
+```
+
+
+
+### 04 树专题
+
+#### 1. 单元最短路径（Dijkstra）算法
+
+**题目描述**：给定一个图和出发节点，找到这个节点到所有节点的最短路径，图中不存在权值为负数的边
+
+![image-20220630113253048](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220630113253048.png)
+
+**算法思路**
+
+- 找到目前未确定节点中的最短路径
+- 将该路径对应节点加入已确认集合
+- 用该节点的边信息更新代价表
+- 重复以上步骤，直至所有节点加入已确认集合
+
+
+
+#### 2. 前缀树（Trie） 208
+
+**题目描述**：构建前缀树结构，用于记录字符串集合信息，并支持以下操作
+
+- **insert**：加入word记录
+- **prefixNumber**：以指定prefix为前缀的word加入过几次
+- **search**：查询指定word之前加入过几次
+- delete：删除word的一条记录
+
+
+
+**算法思路**
+
+- 前缀树**本质为26叉树**
+- 前缀树**root为空节点**
+- 前缀树**将字符存储在边上**
+- 建树时，有则复用，没有则新建
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220725225435622.png" alt="image-20220725225435622" style="zoom: 67%;" />
+
+
+
+**解题代码**
+
+- TireNode结构设计
+
+```c++
+class TireNode {
+public:
+    TireNode() {
+        pass = 0;
+        end = 0;
+        memset(nexts, 0, sizeof(TireNode *) * 26); // 指针清零，新节点没有通向任何字符的路
+    }
+    int pass;            	// 有多少路径通过该节点
+    int end;             	// 有多少路径以该节点结束
+    TireNode *nexts[26];	// null表示无该路径，合法节点表示存在后续的指定字母（字母存储在路径上）
+};
+```
+
+
+
+**注意事项**
+
+- 前缀树适用场景
+  - **单词查询**
+  - 拼写检查
+  - 自动补全
+- 当前缀树字符集不满足只包含小写字母时：
+  -  用map记录当前节点已存在的后续字母 `unordered_map<char, TireNode *> nexts;`
+
+
+
+#### 3. 哈夫曼树
+
+哈夫曼树(Huffman Tree)**是带权路径长度最短的二叉树树**，也称最优二叉树
+
+- 输入：N个有权值的叶子结点
+- 输出：构造一棵带权路径长度最小的二叉树
+
+- 哈夫曼树**通过堆结构构建**
+
+**哈夫曼编码**
+
+- 一种基于哈夫曼树的**不等长编码**
+- 可用于数据压缩
+
+
+
+![image-20220812165512394](C:\Users\ChiGUI\AppData\Roaming\Typora\typora-user-images\image-20220812165512394.png)
+
+
+
+### 05 图专题
+
+图结构关键子在于如何根据题目需求，表达Node、Edge、Graph
+
+图的Edge信息一半以`vector<vector\<int>> input`格式输入 
+
+
+
+#### 1. 图的遍历
+
+DFS -- 用stack实现
+
+BFS -- 用queue实现
+
+
+
+#### 2. 拓扑排序 210
+
+![image-20220812002624299](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812002624299.png)
+
+**图的拓扑排序**
+
+- 有向图
+- 存在入度为0的节点
+- 无环（避免死锁）
+
+
+
+**算法思路**
+
+- 解锁入读为0的节点
+- 擦除节点影响（可能产生新的入读为0的节点）
+- 重复以上步骤
+
+```c++
+// 图节点结构
+class Node {
+public:
+    int val;
+    unordered_set<int> pre;    // 前置课程数组
+    unordered_set<int> next;   // 后继课程数组
+};
+
+Node graph[numCourses];	// 图本身
+```
+
+
+
+### 06 单调栈
+
+#### 1. 单调栈理论
+
+**单调栈**：**从栈底到栈顶**，**所有元素单调**
+
+- **递减单调栈**：栈底到栈顶**递减**
+
+  - **维护方法**：**入栈时**，弹出比当前入栈元素小的元素
+  - 维护过程中可以获得有用信息，例如**获得最近左右更大值**
+
+- 递增单调栈
+
+  <img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220422225421267.png" alt="image-20220422225421267" style="zoom: 67%;" />
+
+
+
+#### 2. 左右最近更大值位置
+
+**题目描述**
+
+- 获取数组每一个位置的**左右最近更大值位置**（越界标志位为 `-1` ）
+
+- 输入大小为 n 的数组Arr
+- 输出大小为 n 的 `vector<pair<int, int>> biggerPos`向量
+
+
+
+**算法思路**：**单调栈结构**（以数组**不含重复值为例**）
+
+- 数据依次入栈 `stack<int>`
+- 入栈会将**小于**当前元素的数据**弹出**
+- **弹出时记录该位置对应信息**
+  - **当前待入栈元素**的**左侧最近更大值**为当前**栈顶**
+    - 如果栈为空，标志为 -1
+  - **被弹出元素**的**右侧最近更大值**为当前**待入队元素**
+- 遍历完成后，需对栈中剩余数据进行**收尾处理**
+  - **左侧最近更大值**为弹出后的**栈顶**
+  - **右侧最近更大值**为 **-1**（没有右侧更大值）
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20211102223534299.png" alt="image-20211102223534299" style="zoom: 67%;" />
+
+此题中**单调栈中存储的是下标值**
+
+
+
+#### 3. 每日温度 739
+
+![image-20220812004555885](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812004555885.png)
+
+**算法思路**
+
+- **要找右侧最近更大值**
+
+- 应用递减单调栈
+
+
+
+#### 4. 子数组最小乘积的最大值 1856
+
+![image-20220812005627703](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812005627703.png)
+
+
+
+**算法思路** -- 最终答案**必定从某个以arr[ii]为最小值的子数组**中产生
+
+- **要找左右相邻更小值位置** -- 应用递增单调栈
+- 利用左右相邻更小值位置信息，**计算所有i位置对应的f(i)**
+- 在所有f(i)中取最大
+
+
+
+#### 5. 柱状图中的最大矩形84 
+
+![image-20220812011408963](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812011408963.png)
+
+**算法思路** -- 最终答案**必定从以某个arr[ii]为高的矩形中产生**
+
+- **要找左右相邻更小值位置**
+- 应用递增单调栈
+
+
+
+#### 6. 最大矩形85
+
+![image-20220613160646856](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220613160646856.png)
+
+**算法思路**
+
+- 复用84题结论
+- 将85题分解为N个84题求解（N为行数）
+
+
+
+### 07 双指针
+
+**双指针分类**
+
+- 双指针（普通）
+- **快慢指针** -- 链表中应用较多
+- **双指针顺序夹逼** -- 和有序条件绑定
+
+
+
+#### 1. 删除链表倒数第k个节点（快慢指针） 21🌼
+
+![image-20220809163833670](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809163833670.png)
+
+**算法思路：快慢指针**
+
+- fast指针先走**k+1**步
+
+- 特殊情况下，链表共k个节点 - 删除头节点
+
+
+
+#### 2. 求链表入环节点（快慢指针）  22🌼🌼
+
+![image-20220809155245418](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220809155245418.png)
+
+
+
+**算法思路**
+
+- version1：哈希表存储遍历过的节点，第一个重复出现的node为入环node
+- version2：**快慢指针** + 快慢指针第一次重合后将快指针归head，第二次重合即为**入环节点**（**魔性的数学**）
+  - **归位后，快指针和慢指针每次都只移动一步**
+
+
+
+#### 3. 两个无环链表的第一个公共节点（双指针） 52🌼
+
+![image-20220812132342454](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812132342454.png)
+
+**算法思路**
+
+- 错的人一定错过，**对的人终将重逢**。
+
+```c
+ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+    ListNode* p1 = headA;   // 双指针
+    ListNode* p2 = headB;
+    while(p1 != p2){
+        p1 = (p1==NULL) ? headB : p1->next; // 切换跑道
+        p2 = (p2==NULL) ? headA : p2->next; // 切换跑道
+    }
+    return p1;
+}
+```
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20211201123417644.png" alt="image-20211201123417644" style="zoom:50%;" />
+
+
+
+#### 4. 和为s的两个数字（双指针顺序夹逼）57🌼🌼
+
+![image-20220812132818018](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812132818018.png)
+
+**算法思路**
+
+- 双指针顺序夹逼
+- LL RR指针**从数组两端向中间夹逼**
+
+
+
+#### 5. 统计有序矩阵中的负数（双指针顺序夹逼）1351🌼
+
+![image-20220812134151406](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812134151406.png)
+
+**解题思路**：**双指针顺序夹逼**
+
+- 从右上角->左下角开始顺序夹逼
+- **±分界线呈阶梯型**
+
+
+
+### 08 二分查找🌼
+
+#### 1. 二分理论🌼
+
+==while <= 搭配LL=mid+1 RR=mid-1==
+
+出循环后，LL为破坏条件的第一个元素
+
+![image-20220417171034282](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220417171034282.png)
+
+
+
+#### 2. 在排序数组中查找元素的第一个和最后一个位置 34🌼
+
+![image-20220812161627628](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812161627628.png)
+
+
+
+**算法思路** -- **二分查找**
+
+- **lower_bound**：**>=target**的第1个下标
+- **upper_bound**：**>target**的第1个下标
+- targert出现的**次数** = **`upper_bound - lower_bound`**
+
+
+
+**拓扑关系演示**
+
+![image-20220417172600655](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220417172600655.png)
+
+
+
+
+
+### 09 贪心算法
+
+**企图通过局部最优中获取全局最优的方法**
+
+- 能举出反例的直接否定
+- **不要纠结于贪心算法的证明**
+
+贪心算法**往往和堆结构关联**
+
+
+
+#### 1. 会议室宣讲时间安排（贪心）
+
+**题目描述**
+
+- 一些项目要用同一间会议室宣讲
+- 给定一个数组，包涵了所有项目的起止时间信息
+- 要求合理安排时间，使得当天会议室进行的**宣讲次数最多**
+
+
+
+**算法思路**
+
+- 按照选项会结束时间排序，**最先结束的优先安排**，并删除数组中与该项目冲突的项目
+- 重复上一步至数组为空
+
+
+
+#### 2. 最小字典序
+
+**题目描述**：给定一个字符串数组，要求合理安排拼接顺序，使得最终得到的**字典序最小**。
+
+- 字典序直观定义：字典中排布的顺序（递增）
+- 量化方法：将字符串转化为**27进制数进行比较** `a -> 1``z -> 26`
+  - **同长字符串直接比较**
+  - 较短的字符串**补0至同长**再比较
+
+
+
+**算法思路** -- 自定义排序策略
+
+- 将给定的字符串数组按自定义方法排序
+- 安排排序后的顺序依次拼接即为**最小字典序**
+- 注意自定义的比较策略**必须有传递性**
+
+```c++
+bool cmp(string& a, string& b) {
+    return a + b < b + a;
+}
+```
+
+
+
+#### 3. 最省钱的金条切法
+
+**题目描述**
+
+- 切割一根金条的费用数值为金条的长度
+- 要求将一个L长的金条，切割成指定的小长度金条组
+- 求最少花费的代价
+
+
+
+**算法思路**
+
+- 逆向思维，将arr合成L
+- 通过堆结构贪心实现，**每次合成当前最短的两根金条**
+
+本质是构建哈夫曼树
+
+
+
+#### 4. 项目的最高利润IPO（贪心）502🌼
+
+![image-20220812170245212](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812170245212.png)
+
+
+
+**算法思路**
+
+- **打怪升级贪心**，打能打得过的爆装备最好的怪
+- `priority_queue<Project, vector<Project>, CapitalCmp> locks;`  当前未解锁的项目，按照门槛资本升序排列
+- `priority_queue<Project, vector<Project>, ProfitCmp> unlocks;`  当前已解锁项目，按照收益降序排布
+
+
+
+#### 5. 股票最大利润 63
+
+![](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812170434985.png)
+
+
+
+**朴素贪心**
+
+从左到右遍历，维护当前位置前的**历史最低价**
+
+
+
+### 10 滑动窗口
+
+#### 1. 滑动窗口最大值 239🌼
+
+![image-20220812234311383](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812234311383.png)
+
+**算法思路**
+
+- 滑动窗口范围[L, R]
+- 窗口中**存储下标值**
+- R L **右滑过程中维护单调性**
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20211102124503575.png" alt="image-20211102124503575" style="zoom:50%;" />
+
+
+
+```c++
+vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+    vector<int> ans;
+    deque<int> helpDeque;	// 单调双端队列(性质同单调栈) 存储的是下标
+    int L = 0, R = 0;		// 窗口范围[L, R]
+    
+    for(; R<nums.size(); R++){
+        // 弹出已废前浪
+        while(!helpDeque.empty() && nums[R] >= nums[helpDeque.back()]) {	// 维持deque中下标对应值的单调性
+            helpDeque.pop_back();
+        }
+        helpDeque.push_back(R); // 当前位置入队
+        
+        if(R >= k-1){   		// 窗口成型后才能输出
+            ans.push_back(nums[helpDeque.front()]);
+            if(L >= helpDeque.front())  // L右滑可能导致队头过期
+                helpDeque.pop_front();
+            L++;
+        }
+    }
+    
+    return ans;
+}
+```
+
+
+
+**注意事项**
+
+- 双端队列实质上维护的是**会依次成为最大值的可能性**
+
+  - 再无可能成为最大值的下标，**会被右侧更大值对应的下标淘汰**
+
+- 时间复杂度**O(n)**
+
+- 注意**值与值比**，**下标与下标比**
+
+
+
+#### 2. 最长不含重复字符串的子字符串 48
+
+![image-20220812231005412](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812231005412.png)
+
+
+
+**算法思路**
+
+- 维护滑动窗口[LL, RR]
+- 保持win内不存在重复元素
+
+```c++
+int res = 0;
+unordered_set<char> uset;						// 用于去重
+for(int LL = 0, RR = 0; RR < s.size(); RR++) {	// 滑动窗口范围[LL, RR]
+    while(uset.find(s[RR]) != uset.end()) { 	// 维持[LL, RR]范围内不存在重复元素
+        uset.erase(s[LL]);
+        LL++;
+    }
+    uset.insert(s[RR]);
+    res = max(res, RR - LL + 1);
+}
+```
+
+
+
+
+
+### 11 位运算
+
+**异或运算性质**
+
+- a ^ a = 0
+
+- a ^ 0 = a
+
+- a ^ b = b ^ a
+
+- a ^ b ^ c = a ^ (b ^ c)
+
+异或运算也可看做**2进制数的无进位相加**
+
+
+
+#### 1. 只出现1次的数字 136
+
+![image-20220613235011139](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220613235011139.png)
+
+**全体异或**
+
+
+
+#### 2.  数组中数字出现的次数 56-Ⅰ
+
+![image-20220613234340858](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220613234340858.png)
+
+
+
+**算法思路**
+
+- 异或后，找到第1个非0位
+- 以非0位分类，保证将只出现1次的两个数分到不同组当中
+- 分组异或，找出各自组中只出现1次的数
+
+
+
+#### 3.  数组中数字出现的次数 56-II
+
+![image-20220613234636125](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220613234636125.png)
+
+**解题思路**
+
+- 遍历32位，累加得sum，%3及当前位取值
+
+
+
+#### 4. 2 的幂
+
+![image-20220812235858960](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812235858960.png)
+
+**算法思路**
+
+- n为2的幂，**要求n的二进制表示有且只有一个1**
+- n & (n - 1)可以**清除n的最低位1**
+
+```c++
+bool isPowerOfTwo(int n) {
+    if(n <= 0)			// 负数和0不肯能是2的幂
+        return false;
+    
+    return (n & (n - 1)) == 0;
+}
+```
+
+
+
+#### 5. 4的幂
+
+![image-20220813000711751](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220813000711751.png)
+
+**算法思路**
+
+- 先满足**是2的幂**
+- 进一步要求**唯一的1出现在特定位置上**：`0b0101 0101 0101 0101 0101 0101 0101 0101)`
+
+
+
+
+
+### 12 动态规划
+
+依次解锁可用范围 + 额外限定条件，==使问题退化==
+
+**建立状态转移关系**
+
+
+
+#### 1. 最长递增子序列 300
+
+![image-20220812205416657](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812205416657.png)
+
+
+
+**算法思路**
+
+```c++
+int lengthOfLIS(vector<int>& nums) {
+    vector<int> dp(nums.size());    // dp[i]表示nums[0-i]区间且pick nums[i]条件下的最长子序列长
+    for(int ii=0; ii<nums.size(); ii++) {
+        int ret = 0;
+        for(int jj=0; jj<ii; jj++) {    // 遍历找最优
+            if(nums[jj] < nums[ii])
+                ret = max(ret, dp[jj]);
+        }
+        dp[ii] = ret + 1;
+    }
+    
+    return dp.max();
+}
+```
+
+
+
+#### 2. 打家劫舍
+
+![image-20220812205942042](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812205942042.png)
+
+
+
+**算法思路**
+
+```c++
+int rob(vector<int>& nums) {
+    if(nums.size() == 1)    return nums[0];
+    int len = nums.size();
+    int dp[len];    // dp[i]表示抢nums[i]时的最优解
+    dp[0] = nums[0], dp[1] = nums[1];
+    
+    for(int ii=2; ii<len; ii++) {
+        dp[ii] = ::max(dp[ii-1], dp[ii-2] + nums[ii]);
+    }
+    return max(dp[len-1], dp[len-2]);
+}
+```
+
+
+
+#### 3. 乘积最大子数组 152
+
+![image-20220613222030616](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220613222030616.png)
+
+**算法思路**
+
+```c++
+int maxProduct(vector<int>& nums) {
+    int curMax = nums[0], curMin = nums[0], MAX = nums[0];
+    for(int ii=1; ii<nums.size(); ii++) {		// 依次解锁可用范围
+        int ret = curMax;
+        curMax = max(nums[ii], max(curMax * nums[ii], curMin * nums[ii]));	// 必须pick nums[i]
+        curMin = min(nums[ii], min(ret * nums[ii], curMin * nums[ii]));
+        MAX = max(MAX, curMax);	// 全局最优
+    }
+    
+    return MAX;
+}
+```
+
+
+
+### 13 背包专题
+
+#### 1. 01背包（每个物品只用一次） NC145
+
+![image-20220812171308132](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812171308132.png)
+
+
+
+**算法思路**
+
+- dp[k]对应背包容量为k
+- 依次解锁可用物品范围
+- ==逆向更新==，避免重复使用
+
+```c++
+int knapsack(int V, int n, vector<vector<int> >& vw) {
+    vector<int> dp(V+1);		// dp[k]对应背包容量为k
+    for(int ii=0; ii<n; ii++) {	// 依次解锁可用物品范围
+        for(int jj=V; jj>=vw[ii][0]; jj--) {	// 必须逆向更新⭐ 不能用到新的值 保证物品ii只被用到1次
+            // 面对新解锁的物品ii 只有两种选择 1)用 2)不用
+            // 1)对应dp[jj]
+            // 2)对应dp[jj-vw[ii][0]] + vw[ii][1]
+            dp[jj] = ::max(dp[jj], dp[jj-vw[ii][0]] + vw[ii][1]);
+        }
+    }
+    
+    return dp[V];
+}
+```
+
+
+
+#### 2. 完全背包（物品可无限次使用） NC309
+
+![image-20220812171308132](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812171308132.png)
+
+
+
+**算法思路**
+
+- dp[k]对应背包容量为k
+- 依次解锁可用物品范围
+- ==正向更新==，可以重复使用
+
+```c++
+int funcA(int v, int n, vector<vector<int> >& nums) {
+    vector<int> dp(v+1);
+    
+    for(int ii=0; ii<n; ii++) {
+        for(int jj=nums[ii][0]; jj<=v; jj++) {    // 正向更新⭐ 可以用到新的值 对应物品ii被使用多次
+            dp[jj] = ::max(dp[jj], dp[jj-nums[ii][0]] + nums[ii][1]);
+        }
+    }
+    
+    return dp[v];
+}
+```
+
+
+
+#### 3. 分割等和子集
+
+![image-20220812174619918](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812174619918.png)
+
+- 01背包变种
+- **额外要求恰好装满**，所以要**初始标记不可达信息**
+
+
+
+**算法思路**
+
+- 将问题**转化为**能否用nums数组中的数，恰好凑出sum/2
+- 依次解锁可用数字范围
+- 初始标记为不可达
+- ==逆向更新==，避免重复使用
+
+```c++
+vector<int> dp(sumV/2 + 1, -1);                     // -1表示当前位置不可达
+dp[0] = 0; // base case
+for(int ii=0; ii<nums.size(); ii++) {               // 依次解锁可用数字范围
+    for(int jj=dp.size()-1; jj>=nums[ii]; jj--) {   // 只能用一次，所以从大到小更新
+        if(dp[jj - nums[ii]] != -1) {               // 前一位置可达
+            dp[jj] = 0;								// 标记当前位置可达
+        }
+    }
+}
+```
+
+
+
+#### 4. 目标和
+
+![image-20220812175414388](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812175414388.png)
+
+- 01背包变种
+- **额外要求恰好装满**，所以要初始标记不可达信息
+- 要求**取法总数**
+
+
+
+**算法思路**
+
+- 将问题**转化为**能否用nums数组中的数，恰好凑出`(sum - target) / 2`
+- 依次解锁可用数字范围
+- 初始标记为不可达
+- ==逆向更新==，避免重复使用
+
+```c++
+int T = (target + sum);
+vector<int> dp(T+1, 0); // 0标记当前不可达
+dp[0] = 1;				// base case
+for(int ii=0; ii<nums.size(); ii++) {   // 依次解锁nums[ii]使用
+    for(int jj=T; jj>=nums[ii]; jj--) {	// 逆向更行
+        dp[jj] = dp[jj] + dp[jj - nums[ii]];
+    }
+}
+```
+
+
+
+#### 5. 零钱兑换
+
+![image-20220812175856137](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812175856137.png)
+
+- 完全背包变种
+- 要求恰好装满
+
+
+
+**算法思路**
+
+- 依次解锁可用硬币范围
+- 正向更新
+
+```c++
+vector<int> dp(amount + 1, -1); // 默认标记为不可达-1，非-1值表示当前最少用dp[i]种硬币凑成i
+dp[0] = 0;  // base case
+
+for(int ii=0; ii<coins.size(); ii++) {  		// 从左到右依次解锁可用硬币范围
+    for(int jj=coins[ii]; jj<dp.size(); jj++) { // 尝试用新解锁的硬币更新dp表，由于硬币无限取用，从小到大更新
+        if(dp[jj - coins[ii]] != -1) {  		// 前一位置不可达，无法触发更新
+            if(dp[jj] == -1) { 
+                dp[jj] = dp[jj - coins[ii]] + 1;
+            } else {	// 最少种类
+                dp[jj] = ::min(dp[jj], dp[jj - coins[ii]] + 1);
+            }
+        }
+    }
+}
+```
+
+
+
+### 14 股票专题
+
+==依次解锁可用股票范围==
+
+
+
+#### 1. 买卖股票的最佳时机 122
+
+![image-20220812182014641](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812182014641.png)
+
+
+
+**算法思路**
+
+- 对于第i天，只有两种状态
+  - **只有持有股票hold[i]**
+  - **不持有股票unhold[i]**
+- hold[i] & unhold[i]可由hold[i-1] & unhold[i]转移而来
+
+```c++
+vector<int> hold(prices.size());
+vector<int> unhold(prices.size());
+hold[0] = -prices[0];	// base case
+unhold[0] = 0;
+for(int ii=1; ii<prices.size(); ii++) {
+    // 可以从hold[ii-1]不操作转化为hold[ii]状态
+    // 也可以从unhold[ii-1]通过购入prices[ii]转化为hold[ii]状态
+    hold[ii] = max(hold[ii-1], unhold[ii-1] - prices[ii]);
+    unhold[ii] = max(unhold[ii-1], hold[ii-1] + prices[ii]);
+}
+```
+
+
+
+#### 2. 买卖股票的最佳时机（限制2次交易） 123
+
+![image-20220812182517313](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812182517313.png)
+
+
+
+**算法思路**
+
+- 对于第i天，只有4种状态（无事发生状态profit ≡ 0）
+  - 买过1次
+  - 完成1比交易
+  - 完成1笔交易+买1次
+  - 完成2比交易
+
+```c++
+vector<vector<int>> dp(N, vector<int>(4));
+// [0]-买过1次 [1]-完成1比交易 [2]-完成1笔交易+买1次 [3]-完成2比交易
+dp[0][0] = -prices[0];
+dp[0][2] = -prices[0];
+for(int ii=1; ii<N; ii++) {
+    // 从本次不操作and本次操作中取最优
+    dp[ii][0] = max(dp[ii-1][0], -prices[ii]);
+    dp[ii][1] = max(dp[ii-1][1], dp[ii-1][0] + prices[ii]);
+    dp[ii][2] = max(dp[ii-1][2], dp[ii-1][1] - prices[ii]);
+    dp[ii][3] = max(dp[ii-1][3], dp[ii-1][2] + prices[ii]);
+}
+```
+
+
+
+#### 3.  买卖股票的最佳时机（限制K次交易） 188
+
+![image-20220812183354199](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812183354199.png)
+
+
+
+
+
+#### 4. 最佳买卖股票时机（含冷冻期） 309
+
+![image-20220812184953742](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812184953742.png)
+
+**算法思路**
+
+- 对于第i天，只有3种状态
+  - 当前持有股票
+  - 当前不持有股票且处于冷冻期
+  - 当前不持有股票且不处于冷冻期
+
+```c++
+int N = prices.size();
+// 共3种状态
+vector<int> hold(N);            // 1) 当前持有股票
+vector<int> unhold_lock(N);     // 2) 当前不持有股票且处于冷冻期
+vector<int> unhold_unlock(N);   // 3) 当前不持有股票且不处于冷冻期
+hold[0] = -prices[0];           // base case
+
+for(int ii=1; ii<N; ii++) {
+    // 1) 可由 1) 3)转移
+    hold[ii] = max(hold[ii-1], unhold_unlock[ii-1] - prices[ii]);
+    // 2) 只能由 1) 转移
+    unhold_lock[ii] = hold[ii-1] + prices[ii];
+    // 3) 可由 2) 3) 转移
+    unhold_unlock[ii] = max(unhold_lock[ii-1], unhold_unlock[ii-1]);
+}
+```
+
+
+
 
 
 
@@ -715,18 +1687,18 @@ int stoi(string& s, int& index){
 
 #### 1 条件反射
 
-|     题干输入     |         大脑反射输出         |                补充说明                |
-| :--------------: | :--------------------------: | :------------------------------------: |
-|   ==有序数组==   | 二分查找<br />双指针顺序夹逼 |               34<br />57               |
-|     ==逆序==     |            栈结构            |                                        |
-|     ==DFS==      |            栈结构            |          树、图的深度优先遍历          |
-|     ==BFS==      |             队列             |          树、图的广度优先遍历          |
-|     ==贪心==     |            堆结构            |                                        |
-|    ==大数据==    |           哈希分流           |      哈希函数能做到**按种类均分**      |
-|  ==二叉搜索树==  |         中序序列递增         |                                        |
-| ==删除链表节点== |           伪头节点           |                   19                   |
-|   ==二维数组==   |            图结构            | vector<vector\<int>>**提供图的边信息** |
-|                  |                              |                                        |
+|    题干输入    |         大脑反射输出         |                补充说明                |
+| :------------: | :--------------------------: | :------------------------------------: |
+|  ==有序数组==  | 二分查找<br />双指针顺序夹逼 |               34<br />57               |
+|    ==逆序==    |            栈结构            |                                        |
+|    ==DFS==     |            栈结构            |          树、图的深度优先遍历          |
+|    ==BFS==     |             队列             |          树、图的广度优先遍历          |
+|    ==贪心==    |            堆结构            |                                        |
+|   ==大数据==   |           哈希分流           |      哈希函数能做到**按种类均分**      |
+| ==二叉搜索树== |         中序序列递增         |                                        |
+|  ==二维数组==  |            图结构            | vector<vector\<int>>**提供图的边信息** |
+|                |                              |                                        |
+|                |                              |                                        |
 
 
 
@@ -1196,3 +2168,4 @@ int->long或能解决
 ##### trick
 
 时间不足时，bool类型直接返回true，可能通过50%的测试用例
+
