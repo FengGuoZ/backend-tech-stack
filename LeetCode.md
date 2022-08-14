@@ -1088,11 +1088,11 @@ ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
 - 能举出反例的直接否定
 - **不要纠结于贪心算法的证明**
 
-贪心算法**往往和堆结构关联**
+贪心算法==往往和堆结构关联==
 
 
 
-#### 1. 会议室宣讲时间安排（贪心）
+#### 1. 会议室宣讲时间安排
 
 **题目描述**
 
@@ -1109,7 +1109,7 @@ ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
 
 
 
-#### 2. 最小字典序
+#### 2. 最小字典序 45
 
 **题目描述**：给定一个字符串数组，要求合理安排拼接顺序，使得最终得到的**字典序最小**。
 
@@ -1153,7 +1153,7 @@ bool cmp(string& a, string& b) {
 
 
 
-#### 4. 项目的最高利润IPO（贪心）502🌼
+#### 4. 项目的最高利润IPO 502🌼
 
 ![image-20220812170245212](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812170245212.png)
 
@@ -1176,6 +1176,90 @@ bool cmp(string& a, string& b) {
 **朴素贪心**
 
 从左到右遍历，维护当前位置前的**历史最低价**
+
+
+
+#### 6. 两个非重叠子数组的最大和 1031
+
+![image-20220814183619426](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220814183619426.png)
+
+**算法思路**
+
+- 维护L窗口和M窗口
+- L窗口和M窗口**同步右滑动**
+- 记录L窗口的**历史最大值（贪心）**
+- M窗口与L窗口历史最大值相加为**该M窗口能取得的最大和**
+- 滑动过程取最优
+
+```c++
+int func(vector<int>& nums, int firstLen, int secondLen) {
+    int idxF = 0, sumF = 0, maxSumF, idxS = firstLen, sumS = 0;
+    int ans = 0;
+    
+    for(; idxF<firstLen; idxF++) {  // 初始化窗口L
+        sumF += nums[idxF];
+    }
+    maxSumF = sumF; // 记录L窗口的最大值
+    for(; idxS<firstLen+secondLen; idxS++) {    // 初始化窗口M
+        sumS += nums[idxS];
+    }
+    ans = sumF + sumS;
+    
+    for(; idxS<nums.size(); idxF++, idxS++) {
+        sumF = sumF - nums[idxF - firstLen] + nums[idxF];   // L窗口右滑
+        sumS = sumS - nums[idxS - secondLen] + nums[idxS];  // M窗口右滑
+        maxSumF = max(maxSumF, sumF);   // 贪心，取所有L窗口的最大值
+        ans = max(ans, maxSumF + sumS);
+    }
+    
+    return ans;
+}
+```
+
+
+
+#### 7. 课程表Ⅲ 630
+
+![image-20220814190252503](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220814190252503.png)
+
+**算法思路** -- 带反悔的贪心
+
+- 按照结束时间升序排序，**优先修读结束时间早的课程**
+- 当前课程不可修读时，**尝试挤掉已修读课程中耗时最长的课程**，以使当前总消耗时长最小
+
+```c++
+bool cmp(vector<int>& a, vector<int>& b) {
+    return a[1] < b[1];
+}
+
+int scheduleCourse(vector<vector<int>>& courses) {
+    ::sort(courses.begin(), courses.end(), cmp);    // 按照结束时间升序排序
+    
+    int costed = 0, cnt = 0;        // costed为已花费时间
+    priority_queue<int> durations;  // 堆 用于反悔时贪心
+    for(int ii=0; ii<courses.size(); ii++) {
+        // [0]表示课时 [1]表示截止期限
+        if(costed + courses[ii][0] <= courses[ii][1]) { // 当前课程可修读
+            cnt++;
+            costed += courses[ii][0];
+            durations.push(courses[ii][0]);
+        } else {
+            // 当前课程不可修读时，尝试挤掉已修读课程中耗时最长的，否则直接pass当前课程
+            if(!durations.empty() && courses[ii][0]<durations.top()) {
+                costed = costed - durations.top() + courses[ii][0];
+                durations.pop();
+                durations.push(courses[ii][0]);
+            }
+        }
+    }
+    
+    return cnt;
+}
+```
+
+
+
+
 
 
 
@@ -1338,6 +1422,103 @@ bool isPowerOfTwo(int n) {
 
 - 先满足**是2的幂**
 - 进一步要求**唯一的1出现在特定位置上**：`0b0101 0101 0101 0101 0101 0101 0101 0101)`
+
+
+
+#### 6. 使用位运算实现+ - * /
+
+**题目描述**
+
+- 给定int a b，要求不使用算数运算符，实现a b的 **+ - * /运算**
+
+- 题目保证**运算结果不会越界**
+
+
+
+**算法思路**
+
+- **+ 运算**
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220814220024816.png" alt="image-20220814220024816" style="zoom: 67%;" />
+
+- **- 运算**
+  - **b =（~b + 1）**得到 **-b**
+  - 调用**+ 运算**：`add(a, b)`
+
+- *** 运算**
+  - **用移位** 模拟 **乘法算式过程**
+
+- **/ 运算**
+  - **符号位**（31）和**数值位**（0 ~ 30）分开考虑
+  - **计算数值时**，a、b**都是正数**
+  - **0 ~ 31数值位无非0、1**，用循环去**试**
+
+
+
+**解题代码**
+
+```c++
+// +
+int add(int a, int b) {
+    int sum = a;
+    int help = INT_MAX;					// 辅助抹除最高位，防 <<1 是的溢出（C++编译器特性）
+    while(b != 0){   
+        sum = (a ^ b);              	// 无进位相加结果
+        b = (((a & b) & help) << 1);  	// b表示进位信息
+        a = sum;
+    }
+    return sum;
+}
+
+// -
+int minus(int a, int b){
+    int b = (~b) + 1;
+    return add(a, b);
+}
+
+// *
+int multi(int a, int b){
+    int ans = 0;
+    while(b != 0){
+        if((b & 1) != 0)
+            ans = add(ans, a);
+       	a = a << 1; 
+        b = b >> 1;
+    }
+    
+    return ans;
+}
+
+// /
+int iNeg(int val){
+    return (n < 0);
+}
+
+int divide(int a, int b){
+    int x = (isNeg(a))  ? (~a + 1) : a;	// x = abs(a)
+    int y = (isNeg(b))  ? (~b + 1) : b;	// y = abs(b)
+    int ans = 0;
+    for(int ii=31; ii>=0; ii--){
+        if((x>>ii) >= y){			// 右移试探x是否足够大
+            res |= 1 << ii;			// x足够大，当前位置1
+            x = minus(x, y<<ii);	//
+        }
+    }
+    
+    if(isNeg(a) == isNeg(b))		// 同号得正
+        return ans;
+    return (~ans + 1);				// 异号得负
+}
+
+```
+
+
+
+
+
+- 注意事项
+  - **`a << 1`**前要将 a 的**最高位置0**，否则会溢出
+  - **优先右移**试探，**防止溢出**
 
 
 
@@ -1679,7 +1860,164 @@ for(int ii=1; ii<N; ii++) {
 
 
 
+### Kiwi
 
+#### 01 N皇后 51
+
+![image-20220814220412270](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220814220412270.png)
+
+
+
+**算法思路**
+
+- 暴力尝试每一种可能，复杂度为**`O(n!)`**
+- `vector<int> queens(n); ` 用queens[i]表示第i行皇后所处列
+  - ⭐本题灵魂，如此自然保证行不冲突，且形式简洁⭐
+- 注意冲突检测形式
+
+```c++
+bool check(int row, int col) {  // 检查冲突
+    for(int ii=0; ii<row; ii++) {
+        // 列冲突或斜角冲突 |\/
+        if(queens[ii]==col || queens[ii]-ii==col-row || queens[ii]+ii==col+row) {    
+            return false;
+        }
+    }
+    return true;
+}
+void process(int row) { // 当前要在row行安置皇后
+    if(row == N) {
+        CNT++;
+        return ;
+    }
+    for(int jj=0; jj<N; jj++) { // 遍历尝试将row行的皇后放置在jj位置
+        if(check(row, jj)) {
+            queens[row] = jj;   // 放在第jj列
+            process(row + 1);
+        }
+    }
+}
+int totalNQueens(int n) {
+    N = n, CNT = 0;
+    queens = vector<int>(N);
+    process(0);
+    
+    return CNT;
+}
+int N;              // 行数
+int CNT;            // 解数
+vector<int> queens; // queens[i]表示第i行皇后所处位置⭐本题灵魂，如此自然保证行不冲突，且形式简洁⭐
+```
+
+
+
+#### 02 二维数组中的查找 04
+
+![image-20220814222401207](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220814222401207.png)
+
+
+
+**算法思路**：**从右上角出发进行查找**
+
+- cur < target：**向下走**
+
+- cur > target：**向左走**
+
+- cur == target：返回
+
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20211125101117081.png" alt="image-20211125101117081" style="zoom:50%;" />
+
+
+
+
+
+#### 03 求1+2+...+n 64
+
+![image-20220814222938876](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220814222938876.png)
+
+
+
+算法思路
+
+- 递归 + **逻辑运算符短路性质**
+
+
+```c++
+int sumNums(int n) {
+    (n == 1) || (n = n+sumNums(n-1));   // 递归 + 逻辑运算符短路
+    return n; 
+}
+```
+
+- **天秀**
+
+```c++
+int sumNums(int n) {
+    char chs[n][n+1];
+    return sizeof(chs) >> 1; 
+}
+```
+
+
+
+#### 04 数组中出现次数超过一半的数字 39
+
+![image-20220814223158573](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220814223158573.png)
+
+**投票算法**
+
+
+
+#### 05 正则表达式匹配 10
+
+![image-20220814232031187](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220814232031187.png)
+
+
+
+**算法思路 -- 有限状态机递归**
+
+- **p[jj+1] 不为 ***
+  - 当前位置匹配，s p 各自后移1位
+  - 当前位置不匹配，直接返回false
+- **p[jj+1] 为 ***
+  - 当前位置匹配（可以**向3种状态转移**）
+    - **s后移1位 p后移2位**
+    - **s不动 p后移2位**
+    - **s后移1位 p不动**
+  - 当前位置不匹配
+    - **s不动 p后移2位**
+
+关键在于**将 char与* 两两绑定**
+
+
+
+#### 06 可怜的小猪 458
+
+![image-20220622230642552](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220622230642552.png)
+
+**算法思路**
+
+- 信息论知识
+  - 数学yyds
+  - 别去想具体执行的方式
+- **1 只猪，经过 k 轮测试，有 k+1 种可能状态**
+  - 第 1 轮死
+  - 第 2 轮死
+  - …… 
+  - 第 k 轮死
+  - k 轮结束后依然活着
+- 所以 n 只猪， 经过 k 轮测试 ， **有 (k+1)^n 种状态，也就能检测同等数量的水**
+  - 每1种状态映射到1桶水即可
+
+```c++
+int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
+    int round = minutesToTest / minutesToDie;       // 轮数
+    int n = ceil(log(buckets) / log(round+1)) ;     // 计算公式
+    
+    return n;
+}
+```
 
 
 
@@ -2035,6 +2373,72 @@ Info foo(...){
 #### 24 O计算
 
 计算时间复杂度时，将 **`1 2 3 4 … n-1 n`** 序列等价于 **`n n n n … n n`** 序列
+
+
+
+#### 25 图的表示
+
+用vector存储图是一种简便表示，**将编号为i的图节点存储在vec[i]位置**
+
+省去了edge指针在C++中内存管理不变的困扰
+
+```c++
+// LC 851
+class Node {
+public:
+    int num;
+    int quiet;
+    vector<int> next;
+};
+
+// 建图
+vector<Node> graph(N);
+for(int ii=0; ii<N; ii++) {
+    graph[ii].num = ii;
+    graph[ii].quiet = quiet[ii];
+}
+for(auto& vec : richer) {
+    graph[vec[1]].next.push_back(vec[0]);
+}
+```
+
+
+
+
+
+### 剑指Offer第二版
+
+> 20211120 - 20211221
+
+#### 提高代码质量
+
+- 规范性
+- 完整性
+- 鲁棒性
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220419225013831.png" alt="image-20220419225013831" style="zoom: 80%;" />
+
+
+
+#### 解决复杂问题
+
+- 画图：图解
+- 举例：模拟归纳
+- 分解：各个击破
+
+![image-20220419225237182](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220419225237182.png)
+
+
+
+
+
+#### 面试综合能力
+
+- 沟通能力：明确输入输出和题目要求
+- 学习能力：快速接受新概念
+- 知识迁移能力：从简单题中得到提示，从而解决复杂题目
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220419225422322.png" alt="image-20220419225422322" style="zoom:50%;" />
 
 
 
