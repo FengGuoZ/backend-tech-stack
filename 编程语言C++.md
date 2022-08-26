@@ -2082,6 +2082,20 @@ unordered_set和unordered_map**均为散列容器**，底层**基于hashtable实
 
 ### A
 
+#### assert 断言
+
+```c++
+#include <assert.h>
+void assert( int expression );
+```
+
+- expression != 0，断言成功，继续执行
+- expression = 0，断言失败
+  - 向stderr打印错误信息
+  - 调用abort()终止程序
+
+![image-20220826162733656](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220826162733656.png)
+
 
 
 ### B

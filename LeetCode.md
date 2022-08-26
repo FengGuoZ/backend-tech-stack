@@ -1059,7 +1059,7 @@ ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
 
 
 
-#### 2. 在排序数组中查找元素的第一个和最后一个位置 34🌼
+#### 2. lower_bound & upper_bound 34🌼
 
 ![image-20220812161627628](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812161627628.png)
 
@@ -1076,6 +1076,78 @@ ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
 **拓扑关系演示**
 
 ![image-20220417172600655](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220417172600655.png)
+
+
+
+#### 3. 旋转数组的最小数字 11🌼
+
+![image-20220817151513271](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220817151513271.png)
+
+**算法思路**
+
+- 与传统二分不同，mid与rb比较
+- 移位方式kiwi，**强记**
+
+```c++
+int minArray(vector<int>& numbers) {
+    int lb=0, rb=numbers.size()-1;
+	
+    while(lb < rb){
+        int mid = lb + (rb-lb)/2;				// mid与rb比较，注意移位方式
+        if(numbers[mid] < numbers[rb]){
+            rb = mid;
+        } else if(numbers[ii] > numbers[rb]){
+            lb = mid+1;
+        } else{
+			rb--;
+        }
+    }
+    
+    return numbers[rb];
+}
+```
+
+
+
+#### 4.  搜索旋转排序数组 33
+
+![image-20220817153314608](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220817153314608.png)
+
+**算法思路**
+
+`[          part1           ][       part2         ]`
+
+- 分情况二分，首先判断mid归属的part
+
+```c++
+int search(vector<int>& nums, int target) {
+    int LL = 0, RR = nums.size() - 1;
+    while(LL <= RR) {
+        int mid = LL + (RR - LL) / 2;
+        if(nums[mid] == target) {
+            return mid;
+        }
+        if(nums[LL] < nums[mid]) {  // mid位于part1中
+            if(nums[LL] <= target && nums[mid] > target) {
+                RR = mid - 1;
+            } else {
+                LL = mid + 1;
+            }
+            continue;
+        }
+        if(nums[mid] < nums[RR]) {  // mid位于part2中
+            if(nums[mid] < target && target <= nums[RR]) {
+                LL = mid + 1;
+            } else {
+                RR = mid - 1;
+            }
+            continue;
+        }
+        LL++;   // 保证越界
+    }
+    return -1;
+}
+```
 
 
 
@@ -1860,6 +1932,216 @@ for(int ii=1; ii<N; ii++) {
 
 
 
+
+
+### 15  回溯
+
+**backtracking = 递归嵌套for循环**
+
+![image-20220821145724437](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220821145724437.png)
+
+- for构成树的宽度
+- 递归构成树的深度
+
+- 回溯本质是穷举
+- 回溯用于解决：组合问题、排列问题、子集问题
+
+```c++
+// 回溯框架
+void backtracking(参数) {
+	if (终⽌条件) {
+		存放结果;
+		return;
+	}
+    
+	for (选择：本层集合中元素) {
+		处理节点;
+		backtracking(参数);	//递归
+    	撤销处理结果;			 // 回溯
+	}
+}
+```
+
+
+
+注意==回溯过程中的剪枝和去重==
+
+
+
+#### 1. 组合 77
+
+![image-20220821152039467](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220821152039467.png)
+
+**算法思路**
+
+普通回溯
+
+```c++
+void backtracking(int pos) {
+    if(pos == K) {
+        arrs.push_back(arr);
+        return ;
+    }
+    int ret = (pos == 0) ? 1 : arr[pos - 1] + 1;    // pos=0时从1开始枚举
+    for(int val = ret; val <= N; val++) {
+        arr.push_back(val);
+        backtracking(pos+1);    // 递归
+        arr.pop_back();         // 回溯
+    }
+}
+vector<vector<int>> combine(int n, int k) {
+    N = n, K = k;
+    backtracking(0);
+    return arrs;
+}
+vector<vector<int>> arrs;
+vector<int> arr;
+int N, K;
+```
+
+
+
+#### 2. 组合总和 II 40
+
+![image-20220821155935657](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220821155935657.png)
+
+**算法思路**
+
+- 回溯
+
+- 排序后==剪枝去重==
+
+```c++
+// 回溯 + 剪枝
+// 只能从c[start, size())范围内pick
+void backtracking(vector<int>& c, int start, int curSum) {  
+    if(curSum == T) {
+        arrs.push_back(arr);
+        return ;
+    }
+    if(curSum > T || start >= c.size()) {
+        return ;
+    }
+    for(int ii = start; ii < c.size(); ii++) { 	// 从start位置开始枚举
+        if(ii > start && c[ii] == c[ii-1]) {	// 剪枝
+            // c[ii] == c[ii-1]时pick c[ii]的分支是pick c[ii-1]分支的真子集
+            continue;
+        }
+        arr.push_back(c[ii]);
+        backtracking(c, ii + 1, curSum + c[ii]);    // 递归 不许重复使用所以i+1
+        arr.pop_back();                             // 回溯
+    }
+}
+vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+    arrs.clear(), arr.clear();
+    T = target;
+    ::sort(candidates.begin(), candidates.end());   // 排序 去重准备
+    backtracking(candidates, 0, 0);
+    return arrs;
+}
+vector<vector<int>> arrs;
+vector<int> arr;
+int T;
+```
+
+
+
+### 16 并查集
+
+![image-20220821165903443](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220821165903443.png)
+
+- 初始状态下每个节点指向自身
+
+- 集合状态下
+  - 集合头指向自身
+  - 其余节点直接/间接指向集合头
+- 路径压缩后树的深度很浅，**但不能认为每个节点都直接挂载根节点下**
+- 并查集操作时间复杂度为**O(α(N))**可以看作O(1)
+
+```c++
+class UnionFindSet{
+public:
+    // vector<int> nodes;
+    vector<int> fathers;
+    UnionFindSet(int n) {
+       fathers.resize(n);
+        for(int ii=0; ii<=0; ii++) {
+            fathers[ii] = ii;	// 初始指向自身
+        }
+    }
+    
+    int find(int i) {
+        if(fathers[i] == i) {	// 只有集合头指向自身
+            return i;
+        }
+        fathers[i] = find(fathers[i]);	// 递归查找集合头 并进行路径压缩
+        
+        return fathers[i];
+    }
+    
+    void unio(int i, int j) {	// 合并集合
+        int i_fa = find(i);		// 找到i的祖先
+        int j_fa = find(j);		// 找到j的祖先
+        fathsers[j_fa] = i_fa;	// j的祖先指向i的祖先
+    }
+};
+```
+
+
+
+#### 1. 统计无向图中无法互相到达点对数 2316
+
+![image-20220821175130993](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220821175130993.png)
+
+
+
+**算法思路**
+
+并查集
+
+```c++
+// find操作 过程中扁平化
+int find(int i) {
+    if(fathers[i] == i) {
+        return i;
+    }
+    fathers[i] = find(fathers[i]);
+    
+    return fathers[i];
+}
+// 合并操作
+void Union(int i, int j) {
+    int fa_i = find(i);
+    int fa_j = find(j);
+    fathers[fa_j] = fa_i;   // 集合头j并入集合头i
+}
+
+long long countPairs(int n, vector<vector<int>>& edges) {
+    fathers = vector<int>(n);
+    for(int ii = 0; ii < n; ii++) { // 初始化 节点各自指向自身
+        fathers[ii] = ii;
+    }
+    for(int ii = 0; ii < edges.size(); ii++) {
+        // 根据边信息合并
+        Union(edges[ii][0], edges[ii][1]);
+    }
+    unordered_map<int, long> umap;   // <集合头, 集合中元素数量>
+    for(int ii = 0; ii < n; ii++) {
+        umap[find(ii)]++;
+    }
+    long long cnt = 0;
+    for(auto elem : umap) {
+        cnt += elem.second * (n - elem.second);
+    }
+    return cnt >> 1;
+}
+vector<int> fathers;
+```
+
+
+
+
+
 ### Kiwi
 
 #### 01 N皇后 51
@@ -1988,7 +2270,7 @@ int sumNums(int n) {
   - 当前位置不匹配
     - **s不动 p后移2位**
 
-关键在于**将 char与* 两两绑定**
+关键在于**将_* 两两绑定**
 
 
 
@@ -2018,6 +2300,91 @@ int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
     return n;
 }
 ```
+
+
+
+#### 07 质数因子
+
+![image-20220329210031189](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220329210031189.png)
+
+
+
+**解题思路**
+
+遍历[2, sqrt(n)]，如果能整除，直接输出
+
+- **一定不会输出非质数因数**（==非质数因数会被提前分解==）
+- sqrt(n)范围由数学保证
+- 需要收尾处理（n不能分解的很彻底时）
+- 时间复杂度O(n^1/2^)
+
+**避免踩直接判断质数的坑**
+
+```c++
+vector<int> getOddFactors(int n) {
+    int odd = 2;
+    vector<int> odds;
+    while(odd <= sqrt(n)) {
+        if(n % odd) {
+            odds.push_back(odd);
+            n /= odd;
+        } else {
+        	odd++;   
+        }
+    }
+    if(n > 1)	// 收尾处理
+        odds.push_back(n);
+    
+    return odds;
+}
+
+// ps 判断质数
+// bool isPrime(n) {
+//     if(n <= 1) {
+//         return false;
+//     }
+//     for(int i = 2; i * i <= n; i++) {
+//         if(n % i == 0)
+//          	return false;
+//     }
+//     
+//     return true;
+// }
+```
+
+
+
+#### 08 计数质数
+
+![image-20220820230353363](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220820230353363.png)
+
+**算法思路**
+
+埃氏筛
+
+**避免踩直接判断质数的坑**
+
+```c++
+int countPrimes(int n) {
+    vector<int> isOdd(n, 1);  // 默认全质数
+    int cnt = 0;
+    for(int i = 2; i < n; i++) {
+        if(isOdd[i] == 1) {
+            cnt++;
+            // 此时i为新找到的质数 将所有i的倍数标注为合数 2i 3i 4i ...
+            // 更优化的 从i*i开始查找
+            for(long k = i; k * i < n; k++) {
+                isOdd[k * i] = 0;
+            }
+        }
+    }
+    return cnt;
+}
+```
+
+
+
+
 
 
 
