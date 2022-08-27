@@ -2386,6 +2386,8 @@ int ret = str1.compare(str2);		// ret > 0;
 
 
 
+
+
 ### T
 
 
@@ -3492,7 +3494,19 @@ public:
 
 
 
+#### 028 vector::swap 交换vector | vector内存释放
 
+```c++
+template <class T, class Alloc>
+  void swap (vector<T,Alloc>& x, vector<T,Alloc>& y);
+
+// 正常用法
+vector<int> foo, bar;
+foo.swap(bar);				// 容器交换
+
+// 邪教用法
+vector<int>().swap(foo);	// 彻底清空foo foo.capacity()=0
+```
 
 
 
