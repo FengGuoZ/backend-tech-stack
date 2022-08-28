@@ -215,6 +215,38 @@ SELECT COUNT(`salary`) FROM `employees`;
 
 
 
+#### 1.6 MySQL数据类型
+
+**常见数据类型**
+
+- 整型：tinyint、smallint、**int**(4B)、bigint
+- 小数：float、**double**
+- 字符型：char、**varchar**、text、blob
+- 日期：**timestamp**
+
+
+
+**int(11) Vs int(3)**⭐
+
+- int(11)与int(3)都占用4B，**取值范围相同**
+- **11和3决定的是显示长度**
+- int(3)在数值不足3位时会补全为3位（25→025），数值超过3位时无任何影响
+
+
+
+**varchar VS char**⭐
+
+- varchar为可变长度字符串
+
+
+- varchar使用额外1-2B来存储string长度，从而**实现了变长度存储的特性**
+
+
+- varchar(255) 类型的'FengGuo' **占用8个Byte存储**，其中一个Byte值为7(len)
+
+
+- 如果用char(255) 存储'FengGuo' 则会占用255Byte存储
+
 
 
 ### 第2章 DQL 数据查询
@@ -473,7 +505,7 @@ LIMIT 0, 5;
 
 #### 3.8 联合查询 union
 
-**将多条查询语句的结果合并成一个结果**
+用于**将不同表中相同列中的数据查询出来**
 
 ```mysql
 查询语句1
@@ -489,6 +521,8 @@ SELECT t_id,tname FROM t_ua WHERE tGender='male';
 
 - `union`关键字**默认去重**，如果使用`union all` 可以**包含重复项**
 
+- `union`语句查询的字段类型必须一致
+
 - **应用场景**
 
   - 要查询的结果**来自于多个表**
@@ -501,7 +535,365 @@ SELECT t_id,tname FROM t_ua WHERE tGender='male';
 
 
 
+### 第3章 DML 数据操控
+
+**Data Manipulation Language**
+
+- insert
+- update
+- delete
 
 
 
+#### 3.1 插入语句 insert
+
+```mysql
+insert into 表名(字段名,...)
+values(值1,...);
+
+#6.支持多行同时插入
+INSERT INTO `beauty`
+VALUES	(23, '唐艺昕1', '女', '1990-4-23', '18999999999', NULL, 2),
+		(24, '唐艺昕2', '女', '1990-4-23', '18999999999', NULL, 2),
+		(25, '唐艺昕3', '女', '1990-4-23', '18999999999', NULL, 2);
+```
+
+
+
+#### 3.2 修改语句 update
+
+```mysql
+update 表名
+set 列1=新值1, 列2=新值2, ...
+where 筛选条件;
+
+#1.修改单表的记录
+#案例1:修改beauty表中姓唐的女神的电话为13899888899
+UPDATE `beauty`
+SET `phone`='13899888899'
+WHERE `name` LIKE '唐%';
+```
+
+
+
+#### 3.3 删除语句 delete truncate
+
+```mysql
+delete from 表名 where 筛选条件;
+
+#方式一: delete
+#1.单表的删除
+#案例1:删除手机号以9结尾的女神信息
+DELETE FROM `beauty`
+WHERE `phone` LIKE '%9';
+
+#方式二：truncate (清空数据)
+TRUNCATE TABLE `my_employees`;
+```
+
+
+
+**`delete Vs truncate`**⭐
+
+- delete **可以加where条件**，truncate不能加
+- 在清空表数据时，truncate **效率高一丢丢**
+- 删除的表中**有自增长列时**
+  - delete删除后，再插入数据，**自增长列的值从断点开始**
+  - truncate删除后，再插入数据，**自增长列的值从1开始**（清空得更彻底）
+- **truncate 删除不能回滚**，delete 删除可以回滚.
+
+
+
+### 第4章 DDL 数据定义语言
+
+**Data Definition Language**
+
+- create
+- alter
+- drop
+
+
+
+#### 4.1 库的管理 create|alter|drop database
+
+```mysql
+create database 库名;
+
+# 创建库
+CREATE DATABASE IF NOT EXISTS books;	# 如果库不存在，则创建(if exists提供容错处理)
+
+# 修改库属性
+ALTER DATABASE books CHARACTER SET UTF8;
+
+# 删除库
+DROP DATABASE IF EXISTS books;
+```
+
+- `IF NOT EXISTS` **用于容错**，避免因库已存在而报错
+
+
+
+#### 4.2 表的管理 create|alter|drop table
+
+```mysql
+# crate table
+CREATE TABLE IF NOT EXISTS Book(
+	id INT,
+	bName VARCHAR(20),
+	price DOUBLE,
+	authorID INT, 
+	publishDate DATETIME
+);
+DESC book;	# 显示表结构
+
+# alter table
+# alter table可搭配add|drop|change|modify column使用
+ALTER TABLE 'author' ADD COLUMN 'annual' DOUBLE;
+
+# drop table
+DROP TABLE IF EXISTS 指定表名;
+```
+
+
+
+#### 4.3 约束 constraint
+
+用于**限制字段属性，保障数据一致性**
+
+|  约束名称  |     关键字      |                             作用                             |     应用举例     |
+| :--------: | :-------------: | :----------------------------------------------------------: | :--------------: |
+|    主键    | **PRIMARY KEY** |              保证该字段具备**唯一性，并且非空**              |   员工号、学号   |
+|   唯一键   |   **UNIQUE**    |              保证该字段具备**唯一性，可以为空**              |     电话号码     |
+|  非空约束  |  **NOT NULL**   |                     保障该字段的值不为空                     |  重要字段如姓名  |
+| 默认值约束 |   **DEFALUT**   |                      保证该字段有默认值                      |    汉族、中国    |
+|    外键    | **FOREIGN KEY** | 用于限制两个表的关系，用于保证从表该字段的值必须来自主表关联字段 | 学生表的专业编号 |
+|  检查约束  |    **CHECK**    |                        mysql中不支持                         |        \         |
+
+```mysql
+# 创建表时添加约束
+CREATE TABLE major(
+    # 约束语法：字段名 类型 约束
+	id INT PRIMARY KEY, 			#主键（列级）
+	majorName VARCHAR(20) NOT NULL 	#非空约束（列级）
+);
+
+CREATE TABLE stuinfo(				# stuinfo依赖于major
+	id INT PRIMARY KEY, 			#主键（列级）
+	stuName VARCHAR(20) NOT NULL, 	#非空约束（列级）
+	gender CHAR(1) ,
+	seat INT UNIQUE,				#唯一约束（列级）
+	age INT DEFAULT 18, 			#默认值约束（列级）
+	majorID INT,
+    
+    # 外键约束语法：CONSTRAINT 约束名 FOREIGN KEY(从表字段名) REFERENCES 主表名(主表主键)
+    CONSTRAINT fk_stuinfo_major FOREIGN KEY(majorID) REFERENCES `major`(id)
+);
+```
+
+
+
+**主键 VS 唯一键**
+
+|        | 是否唯一 | 是否非空 | 同类键个数 |
+| :----: | :------: | :------: | :--------: |
+|  主键  |    √     |    √     |   <=1个    |
+| 唯一键 |    √     |    ×     |    n个     |
+
+
+
+#### 4.4 自增长列 AUTO_INCREMENT
+
+可以不用手动插入值，**系统提供默认的自增长序列**
+
+- 一般**与PRIMARY KEY连用**
+- 默认初值为1，step为1
+
+```mysql
+# 创建表时设置标识列
+CREATE TABLE `tab_identity`(
+	id INT PRIMARY KEY AUTO_INCREMENT,	#设置自增长属性
+	`name` VARCHAR(20)
+);
+```
+
+
+
+```mysql
+create table stu_info(
+	id INT primary key auto_increment,
+    name varchar(20),
+    age int(3),
+    money int(10) default 0
+);
+```
+
+
+
+
+
+### 第5章 TCL 事务控制
+
+**Transaction Control Language**
+
+
+
+#### 5.1 事务
+
+事务指一组sql语句组成执行单元
+
+InnoDB支持事务，MyISAM不支持事务
+
+```mysql
+# 转账事务演示
+
+# 1.开启事务
+SET autocommit=0;
+
+# 2.业务语句
+UPDATE `account`
+SET `balance`=500
+WHERE `username`='张无忌';
+UPDATE `account`
+SET `balance`=1500
+WHERE `username`='赵敏';
+
+# 3.提交or回滚事务
+COMMIT;
+# ROLLBACK;
+
+# 4.autocommit自动重置为1
+```
+
+
+
+**事务的ACID属性**（⭐面试题）
+
+- **原子性 Atomicity**：事务是不可分割的工作单位
+- **一致性 Consitency**：事务是**数据库从一致性状态A转化为一致性状态B**
+  - 转账事务余额总量不变
+- **隔离性 Isolation**：一个事务在执行时，**不被其它事务所干扰**
+- **持久性 Durability**：事务提交后，**改变是永久性的**，不可撤销
+
+
+
+#### 5.2 隔离级别
+
+**事务并发问题**：并行事务同时访问数据库中相同数据时产生并发问题
+
+- **脏读**：一个事务读取了其它事务更新但未提交的数据
+- **不可重复读**：一个事务两次读取的值不一致
+- **幻读**：一个事务读取了其它事务插入但未提交的数据，两次读到的记录数不一致
+
+
+
+**数据库事务隔离技术**：用于解决事务并发问题，**使事务之间不会相互影响**
+
+- **隔离级别**：指事务与其它事务之间的隔离程度
+
+- **分为4级**，隔离级别越高，**数据一致性越好**，**但并发能力越弱**）（内生矛盾）
+- 以最高级**serializable(串行化)**为例，该事务操作表A时，其余事务访问表A时，**会被阻塞**（类似于锁机制）
+
+|                                  | 脏读 | 不可重复读 | 幻读  |
+| :------------------------------: | :--: | :--------: | :---: |
+| **read uncommitted**（读未提交） |  √   |     √      |   √   |
+|  **read committed**（读已提交）  |  ×   |     √      |   √   |
+| **repeatable read**（可重复读）  |  ×   |     ×      |   √   |
+|     **serializable**(串行化)     |  ×   |     ×      | **×** |
+
+**数据库默认隔离级别**
+
+- **Mysql：repeatable read**
+- Oracle：read committed
+
+
+
+**事务隔离相关指令**
+
+```mysql
+# 查看当前隔离级别
+SELECT @@tx_isolation;
+
+# 设置 当前连接|数据库 隔离级别
+SET SESSION|GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;
+```
+
+
+
+### Linux下使用MySQL
+
+mysql命令行
+
+```bash
+sudo service mysql start	# 启动mysql服务
+sudo mysql -uroot -p		# 登录mysql客户端 需要输入密码
+
+status						# 查看mysql基础配置 可通过vim /etc/my.cnf修改
+show databases;				# 查看当前数据库
+use DBname;					# 使用name库
+show tables;				# 查看当前库中所有表
+desc tableName;				# 展示表结构
+
+exit;						# 退出mysql客户端
+sudo service mysql stop		# 关闭mysql服务
+```
+
+![image-20220828135642817](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220828135642817.png)
+
+![image-20220828141823369](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220828141823369.png)
+
+
+
+## MySQL面试八股
+
+#### 01 MySql表间关系
+
+**1-n关系**，2张表可表示
+
+- 国际分类下可以有很多文章
+
+**n-n关系**，3张表可表示
+
+- 学生可以选多门课，一门课下有多个学生
+- **第3张表专门用于存储课与学生的对应关系**
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220828143050078.png" alt="image-20220828143050078" style="zoom:80%;" />
+
+#### 02 key Vs index
+
+**key包含constraint和index两重含义**
+
+-  **primary key**
+  - 唯一约束和非空约束
+  - 同时在此key上建立了index
+
+- **unique key**
+  - 唯一约束
+  - 同时在此key上建立了index
+
+
+
+**index是纯粹的索引，一种辅助查询的数据结构**
+
+```mysql
+show index from `class`;								# 显示class表中的索引信息
+create index index_username on `class`(`name`);			# 给class表的name字段添加名为index_username的索引(普通索引)
+```
+
+<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220828144856077.png" alt="image-20220828144856077"  />
+
+
+
+#### 03 mysql读写锁
+
+```mysql
+lock table `user` read;		# 给user表上读锁 上锁后【所有用户】只能读user 不能写user
+unlock tables;				# 释放锁
+
+lock table `user` write;	# 给user表上写锁 上锁后【该用户】可读写user【其余用户】不可读写user
+unlock tables;				# 释放锁
+```
+
+上读锁后，写请求被拒绝
+
+![image-20220606000211071](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220606000211071.png)
 
