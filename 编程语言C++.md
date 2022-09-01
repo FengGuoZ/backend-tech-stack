@@ -2821,7 +2821,8 @@ int main(int argc, char *argv[]) {
 
 - 类静态变量**类内申明，类外定义**
   - 类内只是申明类静态变量
-  - 类静态变量使用前**必须在类外初始化**，此过程**在编译阶段完成**
+  - 类静态变量使用前**必须在类外定义**
+  - 类静态变量的初始化在main函数开始之前
 
 
 
@@ -2845,11 +2846,11 @@ public:
   static int sValue;			// 类静态变量 类内申明
 };
 
-int staticTest::sValue = 824; 	// 类外定义、初始化
+int staticTest::sValue = 824; 	// 类外定义
 
 int main(int argc, char *argv[]){
-  staticTest::ifoCout();	//直接用类名调用类方法
-  cout << staticTest::sValue << endl;//直接用类名调用类变量
+  staticTest::ifoCout();				//直接用类名调用类方法
+  cout << staticTest::sValue << endl;	//直接用类名访问类变量
 
   return 0;
 }
@@ -2936,8 +2937,6 @@ int类型上下界，**[2.22507e-308, 1.79769e+308]**(-2^31 到 2^31-1)
 
 
 
-
-
 **DBL_EPSILON**
 
 double类型精度，具体值为<img src="https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220722215153830.png" alt="image-20220722215153830" style="zoom:25%;" />
@@ -2971,7 +2970,7 @@ f1 == f2;					// 错误做法,会引发逻辑错误
 
   - 与函数名、形参名无关
 
-  - 函数指针声明格式 -- **`returnType (*指针名)(参数列表);`**
+  - 函数指针声明格式 -- **`returnType (*指针名)(参数类型列表);`**
 
 - 函数指针**可作为输入/输出参数使用**，例如回调函数中的函数指针变量，用户可以传入同类型自定义函数
 
@@ -3108,7 +3107,7 @@ set<Str, Strcmp>;							// 创建Str的set对象，注意这里给的是类本�
 
 #### 014 前向声明🌼
 
-**前向声明**(forward declare) -- **在定义类之前先声明**
+**前向声明(forward declare)指在定义类之前先声明**
 
 - 适用于**类之间相互包含**的情况
 
@@ -3157,7 +3156,7 @@ vector<int> foo(10);		// 指定初始大小，不指定值（编译器默认填�
 vector<int> foo1(20, 4); 	// 指定初始大小和值
 ```
 
-**初始化后分配** -- resize()
+**初始化后分配resize()**
 
 ```c++
 foo.resize(10);		// 重设大小，扩大的部分默认填充0
@@ -3192,7 +3191,7 @@ foo.resize(10, 6);	// 重设大小，扩大部分填充为指定值
 
 - 内存大小**与操作系统位数有关**，与容器内**存放数据的数量\类型无关**
 
-  - vector**本身拥有**三个迭代器 **start**、**finish**、**end_of_storage**
+  - vector**本身拥有三个迭代器 start、finish、end_of_storage**
 
   - **迭代器是特化的指针**，所以 vector 本身大小为 **24Byte**
 
@@ -3412,7 +3411,7 @@ catch(...) {	// 能够捕获任意异常 一般是最后一个catch块
 
   - try块中抛出异常类型，**转到第一个匹配异常类型i的catch块中执行**
 
-- 异常**若在本函数中未被处理**，会**层层上抛给调用者**
+- 异常若**在本函数中未被处理，会层层上抛给调用者**
 
   - 若抛到main函数中仍未被处理，则**程序立即异常终止**
 
