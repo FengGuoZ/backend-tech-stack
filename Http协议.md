@@ -186,6 +186,15 @@ Http采用**`req/resp`模型**（请求/响应），客户端发送请求，服�
 
 
 
+#### HTTP1.0 Vs HTTP1.1
+
+- 1.0默认短连接，1.1支持长连接，用Keep-Alive字段指明
+- 1.0支持 GET POST HEAD方法，1.1新增OPTIONS PUT PATCH DELETE TRACE CONNECT
+
+
+
+
+
 #### HTTPS协议🌼
 
 HTTPS在应用层与传输层之间**增加SSL安全套接字层**

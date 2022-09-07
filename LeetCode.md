@@ -1164,7 +1164,7 @@ int search(vector<int>& nums, int target) {
 
 
 
-#### 1. 会议室宣讲时间安排
+#### 1. 会议室宣讲时间安排 646
 
 **题目描述**
 
@@ -2810,6 +2810,14 @@ for(auto& vec : richer) {
 
 
 ### ACM指北
+
+**万能头文件 bits/stdc++.h**
+
+```c++
+#include <bits/stdc++.h>
+```
+
+
 
 #### IO函数
 
