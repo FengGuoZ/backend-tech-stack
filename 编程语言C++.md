@@ -3661,6 +3661,37 @@ public:
 
 
 
+#### 36 指向nullptr的类指针
+
+- 可以访问普通成员函数，普通成员函数属于类
+
+- 不能访问成员变量，因为没有分配内存
+
+- 不能访问虚函数，因为没有虚表指针
+
+```c++
+class Foo {
+public:
+    void func1() {
+        cout << "func1" << endl;
+    }
+    virtual void func2() {
+        cout << "func2" << endl;
+    }
+    int val;
+};
+
+int main() {
+    Foo* f = nullptr;	// Segmentation fault
+    f->func1();			// 正确访问
+    f->func2();			// Segmentation fault
+
+    return 0;
+}
+```
+
+
+
 
 
 ## C++面试八股
@@ -3998,7 +4029,7 @@ public:
 
 **RAII**（Resource Acquisition is Initialization 资源获取即初始化）是一种封装机制，可以防止内存泄漏
 
-- 用于搭配类管理动态内存，**将动态内存与对象生命周期绑定**
+- 用于管理类中的动态内存，**将动态内存与对象生命周期绑定**
 
 - **在构造函数中申请资源（new）**，这样对象初始化时会自动申请动态内存
 
@@ -4067,6 +4098,7 @@ int main(){
 unique_ptr<int> foo(new int(1));        // 初始化构造，指向堆内存
 unique_ptr<int> bar;                    // 先声明，此时不可用*bar访问，会导致segmentation fault
 bar = unique_ptr<int>(new int(2));      // 再指向堆内存
+cout << *foo << " " << *bar << endl;    // 用*访问内容 
 
 foo.swap(bar);                          // 交换所有权
 int* p = foo.get();                     // 获取裸指针 
