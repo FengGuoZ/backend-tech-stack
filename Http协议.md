@@ -199,7 +199,7 @@ Http采用**`req/resp`模型**（请求/响应），客户端发送请求，服�
 - 1.0默认短连接，1.1支持长连接，用Keep-Alive字段指明
 - 1.0支持 GET POST HEAD方法，1.1新增OPTIONS PUT PATCH DELETE TRACE CONNECT
 
-
+HTTP2.0为当前最新版本
 
 
 
@@ -259,3 +259,14 @@ TLS：Transport Layer Security 传输安全层
 
 
 
+#### 基于CA证书的密钥交换过程
+
+- 服务器向CA机构提交信息，申请CA证书
+
+- CA机构审核验证后下发证书，证书由CA机构私🔑加密
+
+- CA证书包含
+  - 服务器信息与服务器公🔑绑定关系
+  - CA机构信息
+  - 证书有效时间
+- 浏览器下载CA证书，用CA机构公🔑解密证书，获取服务器公🔑

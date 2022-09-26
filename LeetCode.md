@@ -1608,8 +1608,6 @@ int divide(int a, int b){
 
 ![image-20220812205416657](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812205416657.png)
 
-
-
 **算法思路**
 
 ```c++
@@ -1721,7 +1719,7 @@ int knapsack(int V, int n, vector<vector<int> >& vw) {
 - ==正向更新==，可以重复使用
 
 ```c++
-int funcA(int v, int n, vector<vector<int> >& nums) {
+int funcA(int v, int n, vector<vector<int>>& nums) {
     vector<int> dp(v+1);
     
     for(int ii=0; ii<n; ii++) {
@@ -1869,7 +1867,7 @@ for(int ii=1; ii<prices.size(); ii++) {
 
 
 
-**算法思路**
+**算法思路 -- 4路dp**
 
 - 对于第i天，只有4种状态（无事发生状态profit ≡ 0）
   - 买过1次
@@ -1897,7 +1895,24 @@ for(int ii=1; ii<N; ii++) {
 
 ![image-20220812183354199](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220812183354199.png)
 
+**算法思路 --2K路dp**
 
+```c++
+vector<vector<int>> dp(N, vector<int>(2 * k));  // [0, 2k-1] 表示操作[1, 2k]次
+for(int jj=0; jj < 2*k; jj+=2) {
+    dp[0][jj] = -prices[0];
+}
+for(int ii=1; ii<N; ii++) {
+    dp[ii][0] = max(dp[ii-1][0], -prices[ii]);
+    for(int jj=2; jj<2*k; jj+=2) {  // 可能购入当前股票
+        dp[ii][jj] = max(dp[ii-1][jj], dp[ii-1][jj-1] - prices[ii]);
+    }
+    for(int jj=1; jj<2*k; jj+=2) {  // 可能卖出当前股票
+        dp[ii][jj] = max(dp[ii-1][jj], dp[ii-1][jj-1] + prices[ii]);
+    }
+}
+return dp.back().back();
+```
 
 
 
@@ -1962,9 +1977,7 @@ void backtracking(参数) {
 }
 ```
 
-
-
-注意==回溯过程中的剪枝和去重==
+==注意回溯过程中的剪枝和去重==
 
 
 
