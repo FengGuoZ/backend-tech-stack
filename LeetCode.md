@@ -1191,6 +1191,62 @@ int search(vector<int>& nums, int target) {
 
 
 
+#### 5. 寻找两个正序数组的中位数 4🌼
+
+![image-20220930120703257](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220930120703257.png)
+
+
+
+**解题思路**
+
+二分夹逼 + 接口转换
+
+```c++
+// 用于找到两个数组中的第k个数，k>=1
+double getKthVal(const vector<int>& nums1, const vector<int>& nums2, int k) {
+    int M = nums1.size();
+    int N = nums2.size();
+    int index1 = 0, index2 = 0;
+    
+    while (true) {
+        if(index1 == M){
+            return nums2[index2 + k - 1];
+        }
+        if(index2 == N){
+            return nums1[index1 + k - 1];
+        }
+        if(k == 1){
+            return min(nums1[index1], nums2[index2]);
+        }
+        int newIdx1 = min(index1 + k/2 - 1, M - 1);
+        int newIdx2 = min(index2 + k/2 - 1, N - 1);
+        if(nums1[newIdx1] <= nums2[newIdx2]){
+            k -= newIdx1 - index1 + 1;  // 1次夹逼缩减的范围
+            index1 = newIdx1 + 1;
+        } else{
+            k -= newIdx2 - index2 + 1;
+            index2 = newIdx2 + 1;
+        }
+    }
+    
+    // return -1;
+}
+
+double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+    int totalLen = nums1.size() + nums2.size();
+    if (totalLen % 2 == 0) {
+        return (getKthVal(nums1, nums2, totalLen/2) + getKthVal(nums1, nums2, totalLen/2 + 1)) / 2.0;
+    }
+   	return getKthVal(nums1, nums2, (totalLen + 1) / 2);
+}
+```
+
+
+
+
+
+
+
 
 
 ### 09 贪心算法

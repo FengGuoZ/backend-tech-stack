@@ -110,3 +110,24 @@ git config --global https.proxy https://127.0.0.1:33210	# 设置git的https代�
 ![image-20220811003323182](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220811003323182.png)
 
 ![image-20220811003345660](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20220811003345660.png)
+
+
+
+#### git rm --cached -r 移除文件的版本控制
+
+不会删除文件本身
+
+![image-20221209144441259](https://figure-bed-zwd.oss-cn-hangzhou.aliyuncs.com/img_for_markdown/image-20221209144441259.png)
+
+
+
+#### .gitignore 配置不进行版本管理的文件
+
+支持通配符
+
+```
+# 不需要加入git管理的文件类型
+*.mat
+*.l
+```
+
